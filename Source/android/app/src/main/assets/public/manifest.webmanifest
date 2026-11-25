@@ -1,0 +1,39 @@
+{
+  "id": ".",
+  "name": "Drugcopeia AI",
+  "short_name": "Drugcopeia AI",
+  "description": "Chat-first on-device medicine information assistant.",
+  "lang": "en",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f2f6fc",
+  "theme_color": "#1b5fc2",
+  "icons": [
+    {
+      "src": "assets/red-crescent-rx-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/red-crescent-rx-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/red-crescent-rx-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

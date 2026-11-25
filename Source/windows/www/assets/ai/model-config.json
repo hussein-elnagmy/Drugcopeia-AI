@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "comment": "Single place to swap the on-device model. Everything here is data: the app never hard-codes a model name, URL or checksum. After changing model.* update sha256 with tools/ai/model_checksum.py and bump model.version so devices re-download.",
+  "model": {
+    "id": "qwen2.5-1.5b-instruct-q4_k_m",
+    "version": 3,
+    "name": "Qwen2.5-1.5B-Instruct (GGUF, Q4_K_M)",
+    "fileName": "qwen2.5-1.5b-instruct-q4_k_m.gguf",
+    "url": "https://github.com/hussein-elnagmy/Drugcopeia/releases/download/model-v3/qwen2.5-1.5b-instruct-q4_k_m.gguf",
+    "mirrorUrls": [
+      "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf"
+    ],
+    "sizeBytes": 1117320736,
+    "sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+    "chatTemplate": "chatml",
+    "contextTrainLength": 32768,
+    "license": "Apache-2.0",
+    "licenseUrl": "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/blob/main/README.md",
+    "verifiedOn": "2026-11-01",
+    "webUrl": "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf"
+  },
+  "download": {
+    "chunkSizeBytes": 262144,
+    "maxRetries": 3,
+    "retryBackoffMs": [
+      2000,
+      6000,
+      15000
+    ],
+    "connectTimeoutMs": 20000,
+    "stallTimeoutMs": 45000,
+    "resumeHeader": true,
+    "requiresFreeSpaceMultipleOfModelSize": 1.4,
+    "warnOnCellular": true
+  },
+  "generation": {
+    "n_ctx": 2048,
+    "n_threads_policy": "leave-one-core-free",
+    "n_threads_floor": 1,
+    "temperature": 0.3,
+    "top_k": 40,
+    "top_p": 0.9,
+    "min_p": 0,
+    "repeat_penalty": 1.1,
+    "frequency_penalty": 0,
+    "presence_penalty": 0,
+    "n_predict_max_new_tokens": 240,
+    "seed": null,
+    "use_mmap": true,
+    "use_mlock": false,
+    "batch_size": 128,
+    "unicode_decoder": true,
+    "flash_attn": "auto",
+    "gpu_layers": "auto",
+    "prefer_gpu_backends": [
+      "metal",
+      "cuda",
+      "vulkan",
+      "nnapi",
+      "cpu"
+    ],
+    "keepModelWarmWhileChatOpen": true,
+    "warmUpOnLaunch": true,
+    "warmUpDelayMs": 2500,
+    "unloadOnBackground": true,
+    "unloadUnderMemoryPressure": true,
+    "lowMemory": {
+      "comment": "Applied automatically on a device that passes minRamMB but is under recommendedRamMB - every phone with 4 GB of memory or less, which is most of them. The same model file runs with a shorter context and a shorter answer so it fits the memory the OS leaves the app.",
+      "n_ctx": 1024,
+      "n_predict_max_new_tokens": 160,
+      "batch_size": 64,
+      "classify": {
+        "n_ctx": 512,
+        "n_predict_max_new_tokens": 24
+      }
+    },
+    "classify": {
+      "n_predict_max_new_tokens": 32,
+      "temperature": 0,
+      "top_p": 1,
+      "repeat_penalty": 1
+    }
+  },
+  "device": {
+    "comment": "A device below minRamMB never loads the LLM. The assistant then runs the same pipeline with the model disabled and answers through grounded smart search plus a ready-made information card. The model file is under 500 MB, so a 3 GB phone (iPhone X, XR, SE 2, most budget Androids) can hold it, and minRamMB sits just above what a 2 GB device reports because the OS kills the app while that model loads. recommendedRamMB is where the full context size is used, and it is set above 4 GB on purpose: a 4 GB phone reports about 3.7-4.0 GB, so the whole 4 GB class now runs the lean profile instead of the 2048-token window, because the model file plus the app's own copy of the medicine index is what pushes a 4 GB device past what the OS leaves it. Only devices reporting more than 4 GB get the full window.",
+    "minRamMB": 3500,
+    "recommendedRamMB": 4200,
+    "minFreeRamMBAtLoad": 500,
+    "lowMemoryMinFreeRamMBAtLoad": 340,
+    "minFreeRamMBComment": "minFreeRamMBAtLoad refuses a load when the OS reports less free memory than that. On Android the reported figure is MemAvailable, and a healthy 4 GB phone routinely sits between 350 and 600 MB because the OS keeps spare RAM as reclaimable cache, so a lean device uses lowMemoryMinFreeRamMBAtLoad instead of being refused on a phone that can load the shorter profile. The runtime on Apple reports half of total RAM as free, so this gate only bites on Android. The guard against over-committing stays the memory-pressure unload below, which releases the model without losing the download.",
+    "minDiskMB": 1700,
+    "minCores": 4,
+    "unsupportedPlatforms": [],
+    "memoryPressureLowMemoryMB": 600
+  },
+  "paths": {
+    "comment": "App-private storage only. iOS/macOS: Application Support/Dawaya/models. Android: getNoBackupFilesDir or filesDir. Windows: %LOCALAPPDATA%\\Dawaya\\models.",
+    "directoryName": "models",
+    "stateKey": "dawaya-ai-model-state-v1",
+    "chatHistoryKey": "dawaya-ai-chat-v1",
+    "settingsKey": "dawaya-ai-settings-v1"
+  },
+  "web": {
+    "comment": "The web/PWA runtime: llama.cpp compiled to WebAssembly (wllama, MIT), vendored untouched so the browser build has no CDN and no account. The pinned hashes are enforced by scripts/privacy-check.py; keep them and ai/vendor/wllama/README.txt in sync when upgrading. Threads need cross-origin isolation; without it the model still runs single-threaded. The Safari build (compat) is local too, never the jsDelivr fallback.",
+    "wasmRuntime": {
+      "id": "wllama-4.0.0",
+      "module": "ai/vendor/wllama/index.js",
+      "wasm": "ai/vendor/wllama/wllama.wasm",
+      "compatWasm": "ai/vendor/wllama/wllama-compat.wasm",
+      "sha256": {
+        "index.js": "062c3fbaa266dea3ee991c699c176c21cf22e7199b0cac6481182b8708fc703b",
+        "wllama.wasm": "b012436a101ede8c877f2d26644c3181429d4fb8da4fd90c356110d86bfd74a6",
+        "wllama-compat.wasm": "6c5445f579a152c19ccad65aacebb57084d1db2f1b87ad473fa3acc0051ac72f"
+      },
+      "license": "MIT",
+      "licenseFile": "ai/vendor/wllama/LICENSE.txt",
+      "sourceUrl": "https://github.com/ngxson/wllama",
+      "llamaCpp": "b11985 lineage",
+      "verifiedOn": "2026-11-24"
+    }
+  }
+}

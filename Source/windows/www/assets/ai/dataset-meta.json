@@ -1,0 +1,21 @@
+{
+  "version": "unknown",
+  "date": "unknown",
+  "records": 25070,
+  "sourceNameEn": "Dawaya Egyptian medicines database (Egyptian market listing)",
+  "sourceNameAr": "قاعدة بيانات الأدوية المصرية داخل التطبيق",
+  "url": "https://github.com/hussein-elnagmy/egyptian-drug-database",
+  "license": "MIT (EG Drugs dataset by Mahmoud Mohamed) — see webapp/assets/vendor/LICENSE-eg-drugs.txt",
+  "fieldCoverage": {
+    "source_url": 0,
+    "source": 0,
+    "indications": 0,
+    "contraindications": 0,
+    "warnings": 0,
+    "interactions": 0,
+    "leaflet_url": 0,
+    "barcode": 0
+  },
+  "rowsWithoutSource": 25070,
+  "comment": "The Egyptian listing carries trade names, ingredient, company, class, route and price. It carries no per-record source url and no indications, warnings or contraindications, so the assistant flags that instead of inventing them."
+}

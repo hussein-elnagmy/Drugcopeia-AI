@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "comment": "Which prompt file is used where, and which placeholders the code substitutes. Edit the text files freely; keep the placeholder names.",
+  "files": {
+    "system-ar.txt": {
+      "usedBy": "Grounded generation when the question is written in Arabic, or when the interface language is Arabic and the question mixes scripts",
+      "placeholders": ["{{CONTEXT}} — the retrieved medicine records and document passages, formatted by pipeline.js", "{{HISTORY}} — the last few turns of this conversation, empty on the first question", "{{QUESTION}} — the sanitized user question"],
+      "notes": "The eight numbered prohibitions are duplicated in code by safety.js guard patterns, so weakening the text alone cannot remove a guard. The writing section, the red-flag ordering and the conversation-reading section are tone and context, which only the model can honour. The reply language is chosen by the code: pipeline.answerLanguage picks this file or system-ar.txt, so a question in Arabic is never answered in English."
+    },
+    "system-en.txt": {
+      "usedBy": "Grounded generation when the question is written in Latin script",
+      "placeholders": ["{{CONTEXT}}", "{{HISTORY}}", "{{QUESTION}}"],
+      "notes": "safety.js guardOutput checks the answer against the same language this file asks for, so an English question cannot come back in Arabic or the other way round."
+    },
+    "general-ar.txt": {
+      "usedBy": "General-knowledge generation, Arabic, when the question passed the topic gate and step 4 found nothing on the device",
+      "placeholders": ["{{HISTORY}}", "{{QUESTION}}"],
+      "notes": "No {{CONTEXT}} block on purpose: there is nothing to ground on, and pretending there is would let the model copy a number out of an unrelated record. safety.js guardGeneralOutput keeps the two promises this file makes - no number with a unit, no diagnosis of this person - and pipeline.js drops the reply to the reference-links answer when it is broken."
+    },
+    "general-en.txt": {
+      "usedBy": "The same general-knowledge generation for a question written in Latin script",
+      "placeholders": ["{{HISTORY}}", "{{QUESTION}}"]
+    },
+    "chat-ar.txt": {
+      "usedBy": "The conversation reply when a reader greets, thanks, says goodbye or asks about the assistant and the interface language is Arabic",
+      "placeholders": ["{{HISTORY}}", "{{QUESTION}}"],
+      "notes": "No {{CONTEXT}} block on purpose: a greeting carries no medical content, and safety.js guardChatOutput rejects a reply that contains a number, a medicine name or a dose."
+    },
+    "chat-en.txt": {
+      "usedBy": "The same conversation reply for a question written in Latin script",
+      "placeholders": ["{{HISTORY}}", "{{QUESTION}}"]
+    },
+    "classifier.txt": {
+      "usedBy": "Topic gate, only for borderline questions that the keyword and drug-name rules could not decide",
+      "placeholders": ["{{QUESTION}}"],
+      "expectedOutput": "{\"label\":\"HEALTH|EMERGENCY|OFF_TOPIC\",\"confidence\":0.00}",
+      "notes": "Parsed with pipeline.parseClassifierJson; any output that is not strict JSON with a known label is treated as a failed classification and the rule decision stands. Greetings never reach it: policy-config.json conversation patterns decide those first."
+    }
+  }
+}

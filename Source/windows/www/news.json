@@ -1,0 +1,412 @@
+{
+ "generatedAt": "2026-11-02T01:45:21Z",
+ "sources": {
+  "who": "https://www.who.int/api/hubs/newsitems?sf_site=15210d59-ad60-47ff-a542-7ed76645f0c7&sf_provider=OpenAccessDataProvider&sf_culture=en&$orderby=PublicationDateAndTime%20desc&$top=5&$select=Title,ItemDefaultUrl,PublicationDateAndTime,Tag",
+  "whofeature": "https://www.who.int/rss-feeds/feature-stories-english.xml",
+  "whoar": "https://www.who.int/rss-feeds/news-arabic.xml",
+  "fda": "https://api.fda.gov/drug/enforcement.json",
+  "pubmed": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
+ },
+ "items": [
+  {
+   "id": "pubmed:42967349",
+   "kind": "article",
+   "source": "pubmed",
+   "lang": "en",
+   "title": "Artificial intelligence-based tumor detection using stimulated Raman histology in patients undergoing neurosurgical biopsies",
+   "summary": "Intraoperative confirmation of diagnostic tumor tissue is critical in neurosurgical biopsies, particularly in stereotactic procedures, in which sampling error remains a major limitation. Stimulated Raman histology (SRH) enables…",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/42967349/",
+   "date": "2026-11-01",
+   "journal": "Neurosurgical focus"
+  },
+  {
+   "id": "pubmed:42967344",
+   "kind": "article",
+   "source": "pubmed",
+   "lang": "en",
+   "title": "Intraoperative artificial intelligence for brain tumor surgery: from tissue diagnosis to real-time surgical guidance",
+   "summary": "The 2021 WHO CNS tumor classification marked a fundamental shift in neuro-oncology: molecular markers rather than histological appearance now define glioma diagnosis and guide treatment. Yet, in clinical practice the molecular…",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/42967344/",
+   "date": "2026-11-01",
+   "journal": "Neurosurgical focus"
+  },
+  {
+   "id": "pubmed:42967338",
+   "kind": "article",
+   "source": "pubmed",
+   "lang": "en",
+   "title": "Residual Shunt at 6 Months Follow-up After Percutaneous Patent Foramen Ovale Closure in CAHAL: A Comparison of Occlutech and Amplatzer",
+   "summary": "Residual shunt is a known complication in percutaneous patent foramen ovale (PFO) closure, and moderate to large residual shunt has been associated with an increased risk of recurrent stroke. Device-related factors, such as…",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/42967338/",
+   "date": "2026-11-01",
+   "journal": "Catheterization and cardiovascular interventions : official journal of the…"
+  },
+  {
+   "id": "pubmed:42967325",
+   "kind": "article",
+   "source": "pubmed",
+   "lang": "en",
+   "title": "Parents' Diagnostic Resolution and Activation: Examining a Mediation Model on Emotional and Behavioral Outcomes in Autistic Children and Adolescents",
+   "summary": "A diagnosis of Autism Spectrum Disorder poses significant emotional and practical challenges for parents. Although diagnostic resolution and parent activation have been examined separately, little is known about whether parents'…",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/42967325/",
+   "date": "2026-11-01",
+   "journal": "The Journal of genetic psychology"
+  },
+  {
+   "id": "pubmed:42967314",
+   "kind": "article",
+   "source": "pubmed",
+   "lang": "en",
+   "title": "Evaluation of a Standardized Treatment Regimen for Antibody Mediated Rejection Following Lung Transplantation",
+   "summary": "The treatment of antibody mediated rejection (AMR) in lung transplant recipients (LTRs) requires a multi-modal approach targeting various pathways in the immune system. There currently is no consensus on what the standard therapy…",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/42967314/",
+   "date": "2026-11-01",
+   "journal": "Clinical transplantation"
+  },
+  {
+   "id": "pubmed:42967265",
+   "kind": "article",
+   "source": "pubmed",
+   "lang": "en",
+   "title": "Pilot study testing varenicline combined with a behavioral intervention for promoting smoking cessation and pain management among patients with…",
+   "summary": "Many patients with cancer smoke and also experience pain. Smoking offers short-term pain relief but exacerbates pain long-term. We pilot tested the feasibility, acceptability, and preliminary efficacy of adding varenicline to a…",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/42967265/",
+   "date": "2026-11-01",
+   "journal": "Journal of cancer survivorship : research and practice"
+  },
+  {
+   "id": "pubmed:42967261",
+   "kind": "article",
+   "source": "pubmed",
+   "lang": "en",
+   "title": "[Dynamic tongue reconstruction with reinnervated free gracilis muscle flap]",
+   "summary": "At our center, free flap reconstruction is the gold standard after subtotal or total glossectomy performed for oncological indications. In microvascular reconstructive surgery, several factors must be considered when selecting a…",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/42967261/",
+   "date": "2026-11-01",
+   "journal": "Orvosi hetilap"
+  },
+  {
+   "id": "pubmed:42967259",
+   "kind": "article",
+   "source": "pubmed",
+   "lang": "en",
+   "title": "[Differential diagnosis of rheumatoid arthritis pain: the role of subjective DAS28 scores, joint ultrasound, and digital biomarkers in therapeutic…",
+   "summary": "The purpose of this review is to examine the diagnostic challenges arising from the mathematical biases of the DAS28 index used in monitoring rheumatoid arthritis, as well as the psychological and neurobiological factors…",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/42967259/",
+   "date": "2026-11-01",
+   "journal": "Orvosi hetilap"
+  },
+  {
+   "id": "pubmed:42967255",
+   "kind": "article",
+   "source": "pubmed",
+   "lang": "en",
+   "title": "The Steroid Symptom Questionnaire Multiple Myeloma (SSQ-MM): translation and cross-cultural adaptation into Danish and Norwegian and initial…",
+   "summary": "The Steroid Symptom Questionnaire - Multiple Myeloma (SSQ-MM) was developed to assess patient-reported side effects of corticosteroid treatment in multiple myeloma (MM) patients. This study aimed to translate and culturally adapt…",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/42967255/",
+   "date": "2026-11-01",
+   "journal": "Quality of life research : an international journal of quality of life aspects…"
+  },
+  {
+   "id": "pubmed:42967254",
+   "kind": "article",
+   "source": "pubmed",
+   "lang": "en",
+   "title": "Osteoporosis, sarcopenia, locomotive syndrome, and frailty in age-related spinal kyphosis",
+   "summary": "Age-related kyphosis is a common manifestation of musculoskeletal aging associated with falls, mobility decline, reduced participation, and respiratory compromise in severe cases. This narrative review summarizes its…",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/42967254/",
+   "date": "2026-11-01",
+   "journal": "Journal of bone and mineral metabolism"
+  },
+  {
+   "id": "who:31-10-2026-on-world-cities-day-2026--who-calls-for-safe--healthy-housing-for-all",
+   "kind": "news",
+   "source": "who",
+   "lang": "en",
+   "title": "On World Cities Day 2026, WHO calls for safe, healthy housing for all",
+   "summary": "This World Cities Day, celebrated under the theme “Regenerating the City: Adequate Housing for All”, the World Health Organization (WHO) highlights the critical role of housing in shaping health and well-being and calls for…",
+   "url": "https://www.who.int/news/item/31-10-2026-on-world-cities-day-2026--who-calls-for-safe--healthy-housing-for-all",
+   "date": "2026-10-31"
+  },
+  {
+   "id": "who:30-10-2026-barbados-eliminates-mother-to-child-transmission-of-hiv",
+   "kind": "news",
+   "source": "who",
+   "lang": "en",
+   "title": "Barbados eliminates mother-to-child transmission of HIV",
+   "summary": "Barbados has eliminated mother-to-child transmission of HIV as a public health problem, the World Health Organization (WHO) announced, marking a major public health milestone resulting from years of sustained efforts to ensure…",
+   "url": "https://www.who.int/news/item/30-10-2026-barbados-eliminates-mother-to-child-transmission-of-hiv",
+   "date": "2026-10-30"
+  },
+  {
+   "id": "who:30-10-2026-world-conference-on-traditional-medicine-2026-delivers-landmark-outcomes-for-global-health",
+   "kind": "news",
+   "source": "who",
+   "lang": "en",
+   "title": "World Conference on Traditional Medicine 2026 delivers landmark outcomes for global health",
+   "summary": "Expert Committee Meeting members at the World Conference on Traditional Medicine 2026&#169; WHOThe World Conference on Traditional Medicine 2026 concluded in Beijing on 18 October with several key outcomes aimed at strengthening…",
+   "url": "https://www.who.int/news/item/30-10-2026-world-conference-on-traditional-medicine-2026-delivers-landmark-outcomes-for-global-health",
+   "date": "2026-10-30"
+  },
+  {
+   "id": "who:29-10-2026-announcement-of-candidates-for-the-position-of-who-director-general",
+   "kind": "news",
+   "source": "who",
+   "lang": "en",
+   "title": "Announcement of candidates for the position of WHO Director-General",
+   "summary": "Seven candidates have been proposed by Member States of the World Health Organization for the position of WHO Director-General. The candidates will engage with Member States and Associate Members on 18–19 November 2026 at the…",
+   "url": "https://www.who.int/news/item/29-10-2026-announcement-of-candidates-for-the-position-of-who-director-general",
+   "date": "2026-10-29"
+  },
+  {
+   "id": "who:29-10-2026-message-by-the-director-of-the-department-of-immunization--vaccines-and-biologicals-at-who---october-2026",
+   "kind": "news",
+   "source": "who",
+   "lang": "en",
+   "title": "Message by the Director of the Department of Immunization, Vaccines and Biologicals at WHO - October 2026",
+   "summary": "From 5 to 8 October, the Strategic Advisory Group of Experts on Immunization (SAGE) met to review the evidence on vaccines against human papillomavirus (HPV), diphtheria, yellow fever, mpox and polio, and to consider the role of…",
+   "url": "https://www.who.int/news/item/29-10-2026-message-by-the-director-of-the-department-of-immunization--vaccines-and-biologicals-at-who---october-2026",
+   "date": "2026-10-29"
+  },
+  {
+   "id": "whoar:17-05-1448-statement-by-who-director-general-dr-tedros-adhanom-ghebreyesus-concerning-the-train-accident-in-spain",
+   "kind": "news",
+   "source": "whoar",
+   "lang": "ar",
+   "title": "بيان المدير العام لمنظمة الصحة العالمية الدكتور تيدروس أدحانوم غيبريسوس بشأن حادثة تصادم القطارين في إسبانيا",
+   "summary": "وإلى كل من فقد شخصاً عزيزاً هذا الصباح: قلوبنا معكم، ونواسيكم في أحزانكم، وستبقون في ضمائرنا ومشاعرنا خلال الأيام المقبلة.",
+   "url": "https://www.who.int/ar/news-room/17-05-1448-statement-by-who-director-general-dr-tedros-adhanom-ghebreyesus-concerning-the-train-accident-in-spain",
+   "date": "2026-10-29"
+  },
+  {
+   "id": "whoar:18-05-1448-announcement-of-candidates-for-the-position-of-who-director-general",
+   "kind": "news",
+   "source": "whoar",
+   "lang": "ar",
+   "title": "الإعلان عن أسماء المرشحين لمنصب المدير العام لمنظمة الصحة العالمية",
+   "summary": "يمكن الآن الاطلاع على السير الذاتية والمعلومات ذات الصلة بالمرشحين السبعة الذين اقترحتهم الدول الأعضاء في منظمة الصحة العالمية لمنصب المدير العام للمنظمة.",
+   "url": "https://www.who.int/ar/news-room/18-05-1448-announcement-of-candidates-for-the-position-of-who-director-general",
+   "date": "2026-10-29"
+  },
+  {
+   "id": "whoar:10-05-1448-new-global-framework-launched-to-track-increasing-health-risks-of-extreme-heat-for-pregnant-women--newborns-and-children",
+   "kind": "news",
+   "source": "whoar",
+   "lang": "ar",
+   "title": "إصدار إطار عمل عالميّ جديد لرصد المخاطر المتزايدة لموجات الحرارة الشديدة على صحّة النساء الحوامل والمواليد والأطفال",
+   "summary": "أصدرت اليوم منظّمة الصحّة العالميّة (المنظّمة) والمنظّمة العالميّة للأرصاد الجوية ومنظّمة الأمم المتّحدة للطفولة (اليونيسف) وصندوق الأمم المتّحدة للسكان أول مجموعة مؤشرات ذات أولوية لمساعدة البلدان في رصد آثار الحرارة على صحّة…",
+   "url": "https://www.who.int/ar/news-room/10-05-1448-new-global-framework-launched-to-track-increasing-health-risks-of-extreme-heat-for-pregnant-women--newborns-and-children",
+   "date": "2026-10-21"
+  },
+  {
+   "id": "fda:D-0041-2027",
+   "kind": "news",
+   "source": "fda",
+   "lang": "en",
+   "title": "Recall: Sermorelin, 1 mg/mL, 10 ml vial, Sterile injectable solution, RX Only, Houston RX LLC, 15430 Vantage Parkway E STE 220…",
+   "summary": "Houston Rx LLC — Lack of process control — Voluntary: Firm initiated — Nationwide in the USA.",
+   "url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+   "date": "2026-10-21"
+  },
+  {
+   "id": "fda:D-0038-2027",
+   "kind": "news",
+   "source": "fda",
+   "lang": "en",
+   "title": "Recall: Metoclopramide Tablets, USP, 5 mg, [100 or 500] Tablets per bottle, Rx Only, Manufactured for: Teva Pharmaceuticals…",
+   "summary": "Teva Pharmaceuticals USA, Inc — Presence of Foreign Tablets/Capsules — Voluntary: Firm initiated — US Nationwide.",
+   "url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+   "date": "2026-10-21"
+  },
+  {
+   "id": "fda:D-0042-2027",
+   "kind": "news",
+   "source": "fda",
+   "lang": "en",
+   "title": "Recall: Metoclopramide Tablets, USP, 5 mg, 100 Tablets (10 x 10), Rx Only, Distributed by: American Health Packaging, Columbus…",
+   "summary": "American Health Packaging — Presence of Foreign Tablets/Capsules — Voluntary: Firm initiated — US Nationwide",
+   "url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+   "date": "2026-10-21"
+  },
+  {
+   "id": "fda:D-0039-2027",
+   "kind": "news",
+   "source": "fda",
+   "lang": "en",
+   "title": "Recall: Hydrocortisone Sodium Succinate for Injection, USP 100 mg/vial, 1 Vial, Rx Only, Manufactured by: Zydus Lifesciences…",
+   "summary": "Zydus Pharmaceuticals (USA) Inc — Failed Impurities/Degradation Specifications. — Voluntary: Firm initiated — Nationwide within the United States",
+   "url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+   "date": "2026-10-21"
+  },
+  {
+   "id": "fda:D-0040-2027",
+   "kind": "news",
+   "source": "fda",
+   "lang": "en",
+   "title": "Recall: Tirzepatide/Niacinamide 2mL vial (40 MG per Vial) Inj 20mg/2mg/mL, RX Only, Houston RX LLC, 15430 Vantage Parkway E STE…",
+   "summary": "Houston Rx LLC — Lack of assurance of sterility. — Voluntary: Firm initiated — Nationwide in the USA.",
+   "url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+   "date": "2026-10-21"
+  },
+  {
+   "id": "whofeature:making-the-invisible-visible--ethiopia-steps-up-action-to-prevent-lead-exposure",
+   "kind": "news",
+   "source": "whofeature",
+   "lang": "en",
+   "title": "Making the invisible visible: Ethiopia steps up action to prevent lead exposure",
+   "summary": "Ethiopia is working to change that. By strengthening prevention, clinical guidance, laboratory testing, diagnosis and patient care, the country is building a more connected response to a health threat that is often invisible.",
+   "url": "https://www.who.int/news-room/feature-stories/detail/making-the-invisible-visible--ethiopia-steps-up-action-to-prevent-lead-exposure",
+   "date": "2026-10-20"
+  },
+  {
+   "id": "whofeature:advancing-suicide-prevention-in-ghana-with-evidence--responsible-reporting-and-a-new-national-strategy",
+   "kind": "news",
+   "source": "whofeature",
+   "lang": "en",
+   "title": "Advancing suicide prevention in Ghana with evidence, responsible reporting and a new national strategy",
+   "summary": "To mark World Suicide Prevention Day 2026, Ghana brought together the Mental Health Authority, the World Health Organization (WHO), the Ghana Health Service, the Association for Suicide Prevention Ghana and other partners to…",
+   "url": "https://www.who.int/news-room/feature-stories/detail/advancing-suicide-prevention-in-ghana-with-evidence--responsible-reporting-and-a-new-national-strategy",
+   "date": "2026-10-19"
+  },
+  {
+   "id": "whofeature:tinh--from-a-spot-check-to-transforming-refractive-error-care-in-viet-nam",
+   "kind": "news",
+   "source": "whofeature",
+   "lang": "en",
+   "title": "Tinh: From a spot check to transforming refractive error care in Viet Nam",
+   "summary": "Le Quang Tram Tinh began working in school eye health in 2007, where he observed inconsistent outcomes in children’s refractive error care due to a lack of standardized guidelines. Concerned about the quality of spectacles…",
+   "url": "https://www.who.int/news-room/feature-stories/detail/tinh--from-a-spot-check-to-transforming-refractive-error-care-in-viet-nam",
+   "date": "2026-10-19"
+  },
+  {
+   "id": "whofeature:national-newspaper-supplements-mark-world-mental-health-day-2026-in-bangladesh",
+   "kind": "news",
+   "source": "whofeature",
+   "lang": "en",
+   "title": "National newspaper supplements mark World Mental Health Day 2026 in Bangladesh",
+   "summary": "To mark World Mental Health Day 2026, special newspaper supplements were published across nine national newspapers in Bangladesh, helping bring mental health messages to readers across the country. The supplements appeared in…",
+   "url": "https://www.who.int/news-room/feature-stories/detail/national-newspaper-supplements-mark-world-mental-health-day-2026-in-bangladesh",
+   "date": "2026-10-16"
+  },
+  {
+   "id": "whoar:05-05-1448-interpol-and-who-sign-agreement-to-strengthen-global-health-and-security-protection",
+   "kind": "news",
+   "source": "whoar",
+   "lang": "ar",
+   "title": "الإنتربول والمنظّمة يوقعان اتفاقاً لتعزيز حماية الصحّة والأمن العالميّين",
+   "summary": "وقعت المنظّمة الدولية للشرطة الجنائية (الإنتربول) ومنظّمة الصحّة العالميّة (المنظّمة) اتفاق تعاون يهدف إلى التصدّي لتهديدات هي من أكثر التهديدات إلحاحاً فيما يخص عمل قطاعي الصحّة والأمن في القضايا المشتركة.",
+   "url": "https://www.who.int/ar/news-room/05-05-1448-interpol-and-who-sign-agreement-to-strengthen-global-health-and-security-protection",
+   "date": "2026-10-16"
+  },
+  {
+   "id": "whofeature:trusted-voices-and-social-listening-strengthen-influenza-preparedness-in-the-western-pacific-region",
+   "kind": "news",
+   "source": "whofeature",
+   "lang": "en",
+   "title": "Trusted voices and social listening strengthen influenza preparedness in the Western Pacific Region",
+   "summary": "Sustained investment through the Pandemic Influenza Preparedness (PIP) Framework Partnership Contribution is helping countries in the Western Pacific Region build a culture of continuous learning for pandemic preparedness, using…",
+   "url": "https://www.who.int/news-room/feature-stories/detail/trusted-voices-and-social-listening-strengthen-influenza-preparedness-in-the-western-pacific-region",
+   "date": "2026-10-14"
+  },
+  {
+   "id": "whofeature:nepal-aligns-pip-pc-and-pandemic-fund-investments-to-strengthen-pandemic-preparedness",
+   "kind": "news",
+   "source": "whofeature",
+   "lang": "en",
+   "title": "Nepal aligns PIP PC and Pandemic Fund investments to strengthen pandemic preparedness",
+   "summary": "Nepal is strategically combining investments from the Pandemic Influenza Preparedness (PIP) Framework and the Pandemic Fund, hosted by the World Bank, to bolster national health security. Pandemic ...",
+   "url": "https://www.who.int/news-room/feature-stories/detail/nepal-aligns-pip-pc-and-pandemic-fund-investments-to-strengthen-pandemic-preparedness",
+   "date": "2026-10-14"
+  },
+  {
+   "id": "whofeature:preparing-for-the-next-pandemic-who-south-east-asia-region-strengthens-readiness-for-equitable-access-to-medical-countermeasures",
+   "kind": "news",
+   "source": "whofeature",
+   "lang": "en",
+   "title": "WHO South-East Asia Region strengthens readiness for equitable access to medical countermeasures",
+   "summary": "Turning pandemic lessons into action on medical countermeasures The COVID-19 pandemic demonstrated that access to safe, effective and affordable vaccines, therapeutics and diagnostics...",
+   "url": "https://www.who.int/news-room/feature-stories/detail/preparing-for-the-next-pandemic-who-south-east-asia-region-strengthens-readiness-for-equitable-access-to-medical-countermeasures",
+   "date": "2026-10-14"
+  },
+  {
+   "id": "whofeature:gisrs-working-group-reviews-progress-and-agrees-priorities-for-the-future",
+   "kind": "news",
+   "source": "whofeature",
+   "lang": "en",
+   "title": "GISRS working group reviews progress and agrees priorities for the future",
+   "summary": "Over the past 15 years, the World Health Organization (WHO) Global Influenza Surveillance and Response System (GISRS) network expanded by 34 new WHO-recognized National Influenza Centres (NICs) and achieved a high level of…",
+   "url": "https://www.who.int/news-room/feature-stories/detail/gisrs-working-group-reviews-progress-and-agrees-priorities-for-the-future",
+   "date": "2026-10-14"
+  },
+  {
+   "id": "fda:D-0006-2027",
+   "kind": "news",
+   "source": "fda",
+   "lang": "en",
+   "title": "Recall: Sterile Lubricant Dry Eye Relief Eye Drops, 0.5 FL OZ (15 mL); a) LEADER, DISTRIBUTED BY CARDINAL HEALTH, DUBLIN, OHIO…",
+   "summary": "K.C. Pharmaceuticals, Inc. — Lack of Assurance of Sterility — Voluntary: Firm initiated — US Nationwide",
+   "url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+   "date": "2026-10-14"
+  },
+  {
+   "id": "fda:D-0021-2027",
+   "kind": "news",
+   "source": "fda",
+   "lang": "en",
+   "title": "Recall: QUAD-MIX( PAPAV/PHENTO/ALPROS/TROP) INJECTABLE, Packaged in single-use dosage syringes, total mL dispensed based on…",
+   "summary": "Carolina Infusion, LLC — Lack of Assurance of Sterility: Related to processing equipment used in compounded product. — Voluntary: Firm initiated — Nationwide within the U.S",
+   "url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+   "date": "2026-10-14"
+  },
+  {
+   "id": "fda:D-0027-2027",
+   "kind": "news",
+   "source": "fda",
+   "lang": "en",
+   "title": "Recall: TIRZEPATIDE/CYANOCOBALAMIN 26/2 MG/ML INJECTABLE, Packaged in single-use dosage syringes, total mL dispensed based on…",
+   "summary": "Carolina Infusion, LLC — Lack of Assurance of Sterility: Related to formulation using bacteriostic water; Related to processing equipment used in compounded product. — Voluntary: Firm initiated — Nationwide within the U.S",
+   "url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+   "date": "2026-10-14"
+  },
+  {
+   "id": "whoar:01-05-1448-who-welcomes-adoption-of-united-nations-political-declaration-on-pandemic-prevention-preparedness-and-response",
+   "kind": "news",
+   "source": "whoar",
+   "lang": "ar",
+   "title": "المنظّمة ترحّب باعتماد الإعلان السياسي للأمم المتّحدة بشأن الوقاية من الجوائح والتأهّب لمواجهتها والاستجابة لها",
+   "summary": "رحّبت اليوم منظّمة الصحّة العالميّة (المنظّمة) باعتماد الجمعية العامّة للأمم المتّحدة للإعلان السياسي بشأن الوقاية من الجوائح والتأهّب لمواجهتها والاستجابة لها. ويشدّد الإعلان في تأكيده على التضامن والالتزام العالميّين اللازمين…",
+   "url": "https://www.who.int/ar/news-room/01-05-1448-who-welcomes-adoption-of-united-nations-political-declaration-on-pandemic-prevention-preparedness-and-response",
+   "date": "2026-10-12"
+  },
+  {
+   "id": "whoar:01-05-1448-ipc-sudan-food-insecurity-and-malnutrition-alert",
+   "kind": "news",
+   "source": "whoar",
+   "lang": "ar",
+   "title": "مبادرة التصنيف المتكامل لمراحل الأمن الغذائي تحذّر من انعدام الأمن الغذائي وسوء التغذية في السودان",
+   "summary": "وجهت اليوم مبادرة التصنيف المتكامل لمراحل الأمن الغذائي (مبادرة التصنيف)، التي تعدّ منظّمة الصحّة العالميّة (المنظّمة) عضواً فيها، تحذيراً من انعدام الأمن الغذائي وسوء التغذية في السودان.",
+   "url": "https://www.who.int/ar/news-room/01-05-1448-ipc-sudan-food-insecurity-and-malnutrition-alert",
+   "date": "2026-10-12"
+  },
+  {
+   "id": "whoar:01-05-1448-who-pandemic-hub-sets-ambitious-goal-to-detect-new-outbreaks-within-24-hours",
+   "kind": "news",
+   "source": "whoar",
+   "lang": "ar",
+   "title": "مركز المنظّمة لتحليل المعلومات عن الجوائح والأوبئة يحدد هدفاً طموحاً للكشف عن اندلاع أية فاشيات جديدة في غضون 24 ساعة",
+   "summary": "دشنت منظّمة الصحّة العالميّة (المنظّمة) استراتيجية جديدة خمسية لمركزها المعني بتحليل المعلومات عن الجوائح والأوبئة، ترسم مساراً من أجل إيجاد عالم تستطيع فيه كل البلدان رصد التهديدات الصحّية الناشئة وفهمها في غضون 24 ساعة من…",
+   "url": "https://www.who.int/ar/news-room/01-05-1448-who-pandemic-hub-sets-ambitious-goal-to-detect-new-outbreaks-within-24-hours",
+   "date": "2026-10-12"
+  },
+  {
+   "id": "whoar:28-04-1448-who-urges-shift-from-institutional-to-community-based-mental-health-care",
+   "kind": "news",
+   "source": "whoar",
+   "lang": "ar",
+   "title": "منظمة الصحة العالمية تحث على الانتقال من الرعاية المؤسسية إلى الرعاية المجتمعية للصحة النفسية",
+   "summary": "قبل انطلاق فعاليات اليوم العالمي للصحة النفسية، أصدرت منظمة الصحة العالمية (المنظمة) دليلاً جديداً لدعم البلدان في الانتقال من نماذج الرعاية المؤسسية للصحة النفسية، التي تركز على الإقامة الطويلة الأمد في مستشفيات الطب النفسي، إلى…",
+   "url": "https://www.who.int/ar/news-room/28-04-1448-who-urges-shift-from-institutional-to-community-based-mental-health-care",
+   "date": "2026-10-09"
+  }
+ ]
+}

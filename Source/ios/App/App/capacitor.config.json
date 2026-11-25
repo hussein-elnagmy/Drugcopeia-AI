@@ -1,0 +1,16 @@
+{
+  "appId": "com.dawaya.medicineguide",
+  "appName": "Drugcopeia",
+  "webDir": "www",
+  "backgroundColor": "#F8F9FA",
+  "loggingBehavior": "none",
+  "ios": {
+    "contentInset": "never",
+    "scrollEnabled": true,
+    "allowsLinkPreview": false,
+    "limitsNavigationsToAppBoundDomains": false,
+    "handleApplicationNotifications": false,
+    "backgroundColor": "#F8F9FA"
+  },
+  "packageClassList": []
+}
