@@ -324,7 +324,7 @@
   var table=null;
   function loadTable(){
     if(table)return Promise.resolve(table);
-    return fetch('assets/barcode-index.json',{cache:'force-cache'}).then(function(r){return r.ok?r.json():null}).then(function(d){table=d&&d.codes?d.codes:{};return table}).catch(function(){table={};return table});
+    return (window.DawayaNet&&window.DawayaNet.request?window.DawayaNet.request('assets/barcode-index.json',{cache:'force-cache'}):Promise.resolve(null)).then(function(r){return r.ok?r.json():null}).then(function(d){table=d&&d.codes?d.codes:{};return table}).catch(function(){table={};return table});
   }
   function resolveCode(code){
     var digits=String(code||'').replace(/\D/g,'');if(digits.length<8){note(tx().noHit);return}
