@@ -78,7 +78,7 @@
     "copyAnswer": "Copy answer",
     "regenerate": "Rephrase",
     "openSource": "Open in browser",
-    "searchMedicine": "Open medicine cards in Dawaya",
+    "searchMedicine": "Open medicine cards in Drugcopeia",
     "smartSearchBody": "No on-device model is available. These are matching product/reference records, not a single clinical answer. Brand names may cover different ingredients and strengths: pick the exact product and verify its current label. Prices are saved database values, not live quotes.",
     "verifyHeader": "Official sources to verify"
   },
@@ -92,10 +92,10 @@
   },
   "conversation": {
     "comment": "Fixed replies for a greeting, thanks, goodbye or a question about the assistant itself, used when the device has no on-device model to phrase them. The chat guard rejects a model reply that carries a number, a medicine name or medical advice, and this is what the reader gets instead.",
-    "greeting": "Hello! I am the Dawaya assistant. What would you like to ask about today?",
+    "greeting": "Hello! I am the Drugcopeia assistant. What would you like to ask about today?",
     "thanks": "You are welcome. I am here whenever you want to ask about a medicine or a symptom.",
     "farewell": "Goodbye, and take care. Ask me whenever you need a medicine checked.",
-    "smallTalk": "I am the Dawaya assistant. I help with Egyptian medicines - their ingredients, the dose printed on the pack, side effects, interactions and prices - and with general information about symptoms and conditions. What would you like to ask?"
+    "smallTalk": "I am the Drugcopeia assistant. I help with Egyptian medicines - their ingredients, the dose printed on the pack, side effects, interactions and prices - and with general information about symptoms and conditions. What would you like to ask?"
   },
   "emergency": {
     "title": "This is an emergency",
