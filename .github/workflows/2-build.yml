@@ -173,6 +173,12 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           R=$(tr -d '[:space:]' < Source/REVISION)
-          gh release view "r${R}" >/dev/null 2>&1 || gh release create "r${R}" release/* \
-            --title "Drugcopeia AI r${R}" \
-            --notes "Full app, all platforms, revision r${R}. android.apk for Android, windows.exe for Windows, macos.dmg for macOS, ios-unsigned.zip is the unsigned iOS build (sign and install locally with Xcode), source-web.zip is the full source including the web/PWA version."
+          for i in 1 2 3 4; do
+            if gh release view "r${R}" --json assets --jq '.assets|length' 2>/dev/null | grep -qx 5; then break; fi
+            gh release delete "r${R}" -y >/dev/null 2>&1 || true
+            gh release create "r${R}" release/* \
+              --title "Drugcopeia AI r${R}" \
+              --notes "Full app, all platforms, revision r${R}. android.apk for Android, windows.exe for Windows, macos.dmg for macOS, ios-unsigned.zip is the unsigned iOS build (sign and install locally with Xcode), source-web.zip is the full source including the web/PWA version." && break
+            sleep 20
+          done
+          gh release view "r${R}" --json assets --jq '.assets|length' | grep -qx 5
