@@ -3,7 +3,7 @@ const cases={'A-low-memory-natural':()=>{}, 'B-no-opfs':()=>{Object.defineProper
 (async()=>{for(const [name,fn] of Object.entries(cases)){
  const b=await puppeteer.launch({executablePath:'/usr/bin/google-chrome',headless:'new',userDataDir:'/tmp/pu-'+name,args:['--no-sandbox'],defaultViewport:{width:430,height:900}});
  const p=await b.newPage();const errs=[];p.on('pageerror',e=>errs.push(String(e).slice(0,150)));
- await p.evaluateOnNewDocument(`(${fn.toString()})();try{localStorage.setItem('dawaya-language','en')}catch(_){}`);
+ await p.evaluateOnNewDocument(`(${fn.toString()})();try{localStorage.setItem('drugcopeia-ai-language','en')}catch(_){}`);
  await p.goto('http://127.0.0.1:8181/',{waitUntil:'load'});await sleep(3000);
  await p.evaluate(()=>document.querySelector('[data-app-nav="assistant"]').click());await sleep(4000);
  const st=await p.evaluate(()=>({s:document.getElementById('aiStatus').dataset.state,t:document.getElementById('aiStatusText').innerText,why:document.getElementById('aiSmartWhy')?.innerText,banner:!document.getElementById('aiSmartBanner').hidden,startVisible:!!document.getElementById('aiStart').offsetParent}));

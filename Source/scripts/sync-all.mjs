@@ -29,7 +29,7 @@ async function stamp(dir) {
   let html = await readFile(htmlPath, 'utf8');
   let sw = await readFile(swPath, 'utf8');
   html = html.replace(/\?v=\d+/g, `?v=${rev}`);
-  sw = sw.replace(/\?v=\d+/g, `?v=${rev}`).replace(/dawaya-shell-v\d+/, `dawaya-shell-v${rev}`);
+  sw = sw.replace(/\?v=\d+/g, `?v=${rev}`).replace(/drugcopeia-ai-shell-v\d+/, `drugcopeia-ai-shell-v${rev}`);
   await writeFile(htmlPath, html);
   await writeFile(swPath, sw);
 }
@@ -41,7 +41,7 @@ async function check() {
     try {
       const html = await readFile(path.join(dir, 'index.html'), 'utf8');
       const sw = await readFile(path.join(dir, 'service-worker.js'), 'utf8');
-      const cache = (sw.match(/dawaya-shell-v(\d+)/) || [])[1];
+      const cache = (sw.match(/drugcopeia-ai-shell-v(\d+)/) || [])[1];
       const revs = new Set([...html.matchAll(/\?v=(\d+)/g), ...sw.matchAll(/\?v=(\d+)/g)].map(m => m[1]));
       if (cache !== rev || revs.size !== 1 || !revs.has(rev)) problems.push(`${rel}: cache v${cache}, ?v= values {${[...revs].join(',')}}, expected ${rev}`);
       const shell = [...sw.matchAll(/'\.\/([^'?]+)(?:\?v=\d+)?'/g)].map(m => m[1]).filter(f => f && f !== '');

@@ -83,7 +83,7 @@ def network_payload(config):
         "history": history_payload(config),
         "version": config.get("version", 1),
         "defaultOffline": bool(network.get("defaultOffline", True)),
-        "offlineKey": network.get("offlineKey", "dawaya-offline-mode"),
+        "offlineKey": network.get("offlineKey", "drugcopeia-ai-offline-mode"),
         "allowedHosts": [
             {
                 "host": entry["host"],

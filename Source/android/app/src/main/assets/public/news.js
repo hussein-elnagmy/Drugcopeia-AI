@@ -18,7 +18,7 @@
 (function (global) {
   'use strict';
 
-  var CACHE_KEY = 'dawaya-news-v1';
+  var CACHE_KEY = 'drugcopeia-ai-news-v1';
   var SNAPSHOT_URL = 'news.json';
   var TTL = 6 * 60 * 60 * 1000;
   var MAX_ITEMS = 40;

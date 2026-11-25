@@ -21,7 +21,7 @@
 
   var nativeFetch = typeof root.fetch === 'function' ? root.fetch.bind(root) : null;
   var nativeRequest = typeof root.Request === 'function' ? root.Request : null;
-  var OFFLINE_KEY = 'dawaya-offline-mode';
+  var OFFLINE_KEY = 'drugcopeia-ai-offline-mode';
   var ALLOWED_HEADERS = { accept: 1, range: 1, 'cache-control': 1, 'content-type': 1 };
   var CACHE_CONTROL_VALUES = { 'no-cache': 1, 'no-store': 1 };
   /* The Windows assistant talks to its own loopback helper over POST with a JSON

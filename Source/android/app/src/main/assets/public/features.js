@@ -311,7 +311,7 @@
   function renderCalc(id) {
     var c = CALCS.filter(function (x) { return x.id === id; })[0]; if (!c) return;
     calcOpen = id;
-    var hist = store('dawaya-calc-history', {})[id] || [];
+    var hist = store('drugcopeia-ai-calc-history', {})[id] || [];
     var panel = $('#calcPanel'); panel.hidden = false;
     panel.innerHTML = '<h2>' + esc(L(c.t[0], c.t[1])) + '</h2>' +
       '<form class="feat-form" novalidate data-form="' + id + '">' + c.fields.map(function (f) {
@@ -347,14 +347,14 @@
     if (r.err) { out.innerHTML = '<p class="feat-err">' + esc(r.err) + '</p>'; return; }
     var inputs = c.fields.map(function (f) { var v = form.elements[f.k].value; if (f.opts) { var o = f.opts.filter(function (x) { return x[0] === v; })[0]; v = L(o[1], o[2]); } return L(f.l[0], f.l[1]) + ': ' + (v === '' ? '-' : v); });
     out.innerHTML = '<div class="feat-inputs">' + inputs.map(function (i) { return '<span>' + esc(i) + '</span>'; }).join('') + '</div><div class="feat-value">' + esc(r.value) + '</div>' + (r.extra ? '<p>' + esc(r.extra) + '</p>' : '');
-    var all = store('dawaya-calc-history', {}); var arr = all[c.id] || [];
-    arr.unshift(inputs.join(' | ') + ' → ' + r.value); all[c.id] = arr.slice(0, 10); save('dawaya-calc-history', all);
+    var all = store('drugcopeia-ai-calc-history', {}); var arr = all[c.id] || [];
+    arr.unshift(inputs.join(' | ') + ' → ' + r.value); all[c.id] = arr.slice(0, 10); save('drugcopeia-ai-calc-history', all);
   }
   document.addEventListener('click', function (e) {
     var t = e.target.closest && e.target.closest('.feat-tile');
     if (t) { renderCalc(t.getAttribute('data-calc')); var p = $('#calcPanel'); if (p && p.scrollIntoView) p.scrollIntoView({ block: 'start', behavior: 'smooth' }); return; }
     var h = e.target.closest && e.target.closest('[data-clear-hist]');
-    if (h) { var all = store('dawaya-calc-history', {}); delete all[h.getAttribute('data-clear-hist')]; save('dawaya-calc-history', all); renderCalc(h.getAttribute('data-clear-hist')); }
+    if (h) { var all = store('drugcopeia-ai-calc-history', {}); delete all[h.getAttribute('data-clear-hist')]; save('drugcopeia-ai-calc-history', all); renderCalc(h.getAttribute('data-clear-hist')); }
   });
 
   /* ================= study mode ================= */
@@ -429,7 +429,7 @@
   function buildStudyPage() {
     pageShell('studyPage', 'study', '<span class="section-kicker feat-k"></span><h1 class="feat-title"></h1><p class="clinical-intro feat-intro"></p><div id="studyStats" class="feat-stats"></div><div id="studyBody" class="feat-panel"></div>');
   }
-  function stats() { var s = store('dawaya-study-stats', null) || {}; var today = new Date().toISOString().slice(0, 10); s.total = s.total || 0; s.correct = s.correct || 0; s.streak = s.streak || 0; s.last = s.last || ''; s.todayDate = s.todayDate || ''; s.today = s.todayDate === today ? (s.today || 0) : 0; s.todayDate = today; s.hist = s.hist || {}; s.hist[today] = s.today; return s; }
+  function stats() { var s = store('drugcopeia-ai-study-stats', null) || {}; var today = new Date().toISOString().slice(0, 10); s.total = s.total || 0; s.correct = s.correct || 0; s.streak = s.streak || 0; s.last = s.last || ''; s.todayDate = s.todayDate || ''; s.today = s.todayDate === today ? (s.today || 0) : 0; s.todayDate = today; s.hist = s.hist || {}; s.hist[today] = s.today; return s; }
   function renderStudy() {
     var p = $('#studyPage'); if (!p) return;
     $('.feat-k', p).textContent = L('STUDY MODE', 'وضع المذاكرة');
@@ -463,7 +463,7 @@
     if (o && round && round.picked === null) {
       round.picked = Number(o.getAttribute('data-opt'));
       var ok = round.cur.opts[round.picked] === round.cur.ans; if (ok) round.score++;
-      var s = stats(); var today = s.todayDate; s.total++; s.today++; if (ok) { s.correct++; s.streak++; } else s.streak = 0; s.last = today; s.hist = s.hist || {}; s.hist[today] = s.today; save('dawaya-study-stats', s);
+      var s = stats(); var today = s.todayDate; s.total++; s.today++; if (ok) { s.correct++; s.streak++; } else s.streak = 0; s.last = today; s.hist = s.hist || {}; s.hist[today] = s.today; save('drugcopeia-ai-study-stats', s);
       renderStudy(); return;
     }
     if (e.target.closest && e.target.closest('[data-study-next]') && round) { round.i++; round.picked = null; if (round.i < round.n) round.cur = makeQuestion(topicPool(buildPool())); renderStudy(); }

@@ -70,7 +70,7 @@ BANNED_SYMBOLS = CONFIG["dependencies"]["bannedStrings"]
 
 # Not network traffic: XML namespaces and retired keys that are only ever removed.
 NAMESPACE_HOSTS = {"www.w3.org"}
-LEGACY_REMOVED_KEYS = {"dawaya-drugs-v2"}
+LEGACY_REMOVED_KEYS = {"drugcopeia-ai-drugs-v2"}
 
 findings = []
 scanned = []
@@ -185,8 +185,8 @@ scanned.append(CONFIG_PATH)
 def check_config():
     if not isinstance(NET.get("defaultOffline"), bool):
         add("config", CONFIG_PATH, 0, "network.defaultOffline must be a boolean")
-    if NET.get("offlineKey") != "dawaya-offline-mode":
-        add("config", CONFIG_PATH, 0, "network.offlineKey must stay dawaya-offline-mode")
+    if NET.get("offlineKey") != "drugcopeia-ai-offline-mode":
+        add("config", CONFIG_PATH, 0, "network.offlineKey must stay drugcopeia-ai-offline-mode")
     if PLAINTEXT_KEYS & USER_KEYS:
         add("config", CONFIG_PATH, 0, "a storage key is both plaintext and user data: %s" % sorted(PLAINTEXT_KEYS & USER_KEYS))
     banned = set(NET.get("bannedThirdPartyOrigins", []))
@@ -339,7 +339,7 @@ def check_web_network():
     # The wrapper itself must keep its load-bearing properties.
     net = read(os.path.join(WEBAPP, "net.js"))
     required = [
-        ("dawaya-offline-mode", "the persisted offline key"),
+        ("drugcopeia-ai-offline-mode", "the persisted offline key"),
         ("credentials = 'omit'", "credentials are omitted"),
         ("referrerPolicy = 'no-referrer'", "no referrer"),
         ("redirect = 'error'", "redirects to other hosts are refused"),
@@ -354,8 +354,8 @@ def check_web_network():
             add("network-wrapper", os.path.join(WEBAPP, "net.js"), 0, "net.js lost %s" % why)
 
     service = read(os.path.join(WEBAPP, "service-worker.js"))
-    if not re.search(r"dawaya-shell-v\d+", service):
-        add("service-worker", os.path.join(WEBAPP, "service-worker.js"), 0, "cache name is not dawaya-shell-vN")
+    if not re.search(r"drugcopeia-ai-shell-v\d+", service):
+        add("service-worker", os.path.join(WEBAPP, "service-worker.js"), 0, "cache name is not drugcopeia-ai-shell-vN")
     if "url.origin !== self.location.origin" not in service:
         add("service-worker", os.path.join(WEBAPP, "service-worker.js"), 0, "service worker may cache a foreign origin")
     if "event.request.method !== 'GET'" not in service:
@@ -712,7 +712,7 @@ def check_storage():
             key = match.group(1)
             if key in STORAGE_KEYS or key in LEGACY_REMOVED_KEYS:
                 continue
-            if key.startswith("dawaya-shell-"):
+            if key.startswith("drugcopeia-ai-shell-"):
                 continue
             add("undeclared-storage-key", path, line_at(text, match.start()),
                 'storage key "%s" is in no privacy.config.json list' % key)
@@ -723,8 +723,8 @@ def check_storage():
                 if key not in STORAGE_KEYS and key not in LEGACY_REMOVED_KEYS:
                     add("undeclared-storage-key", path, line_at(text, match.start()),
                         'writes undeclared key "%s"' % key)
-        if "dawaya-query-history" in text:
-            add("chat-persistence", path, line_of(text, r"dawaya-query-history"),
+        if "drugcopeia-ai-query-history" in text:
+            add("chat-persistence", path, line_of(text, r"drugcopeia-ai-query-history"),
                 "search-query history is never persisted")
 
     app = read(os.path.join(WEBAPP, "app.js"))

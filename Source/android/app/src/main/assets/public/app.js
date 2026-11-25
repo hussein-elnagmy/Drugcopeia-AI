@@ -16,7 +16,7 @@
   })();
   const withRev = (url) => (ASSET_REV ? `${url}${url.includes('?') ? '&' : '?'}v=${ASSET_REV}` : url);
   const SUGGESTION_EMAIL = 'hussein.sayed994@gmail.com';
-  const CUSTOM_DRUGS_KEY = 'dawaya-custom-drugs-v1';
+  const CUSTOM_DRUGS_KEY = 'drugcopeia-ai-custom-drugs-v1';
   const NEW_MEDICINE_SUBJECT = 'إضافة دواء جديد';
   const $ = (selector) => document.querySelector(selector);
   const core = window.DawayaCore || null;
@@ -46,16 +46,16 @@
   const conditionSummaryObserver='IntersectionObserver' in window?new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){conditionSummaryObserver.unobserve(entry.target);loadConditionCardSummary(entry.target)}}),{rootMargin:'240px'}):null;
 
   let drugs = [], baseDrugs = [], matching = [], mode = 'brand', shown = 20, loadFailed = false, debounce, activeSuggestion = -1, language = 'en', activeDrug = null, activeConditionTopic = null, customDrugs = [], usingBundledData = false;
-  let themePreference=core?.theme?.preference||'system';if(!core){try{themePreference=localStorage.getItem('dawaya-theme')||'system'}catch(_){}}
+  let themePreference=core?.theme?.preference||'system';if(!core){try{themePreference=localStorage.getItem('drugcopeia-ai-theme')||'system'}catch(_){}}
   let reminderSpeakingId='',reminderScheduleSignature='',reminderTimer=0;
   // Drop the obsolete per-tab dataset cache, which can exceed the sessionStorage quota.
-  try{sessionStorage.removeItem('dawaya-drugs-v2')}catch(_){}
+  try{sessionStorage.removeItem('drugcopeia-ai-drugs-v2')}catch(_){}
   let selectedMedicineLetter=null,activeDrugGroup='',activeDrugPath=[],selectedConditionLetter=null,activeConditionGroup='',activeConditionType='',conditionRequest=0,conditionTopicList=[],conditionVisible=6,conditionSuggestionRequest=0,conditionSuggestionTimer=0,conditionSuggestionActive=-1,conditionSuggestionItems=[];
   let modalReturnFocus=null,conditionReturnFocus=null;
   let unifiedConditionItems=[],unifiedConditionRequest=0,unifiedConditionTimer=0,unifiedConditionLoading=false,unifiedLabItems=[],mainSuggestionItems=[];const wikiCache=new Map(),labWikiCache=new Map();
   let relatedDrug=null,relatedKind='',relatedScope='',relatedRoot='',relatedItems=[],relatedShown=20,relatedPriceSort='default',groupWikiToken=0;
   const ingredientSignatureCache=new WeakMap(),fieldTextCache=new WeakMap(),brandTextCache=new WeakMap();const groupCountCache=new Map();let similarIndex=new Map(),classIndex=new Map(),rootClassIndex=new Map(),lastSearchQuery='',lastSearchMode='',lastSearchMatches=null;
-  try { language=localStorage.getItem('dawaya-language')||'en'; } catch (_) { language='en'; }
+  try { language=localStorage.getItem('drugcopeia-ai-language')||'en'; } catch (_) { language='en'; }
   if(!['en','ar'].includes(language))language='en';
 
   // Educational summaries for common ingredients. These are not prescribing instructions.
@@ -2940,12 +2940,12 @@ const CONDITION_SUBGROUPS={
   function currentThemePreference(){return core?.theme?core.theme.preference:themePreference}
   function setThemePreference(choice){
     if(core?.theme){core.theme.setPreference(choice);return}
-    themePreference=choice;try{localStorage.setItem('dawaya-theme',choice)}catch(_){}applyTheme();
+    themePreference=choice;try{localStorage.setItem('drugcopeia-ai-theme',choice)}catch(_){}applyTheme();
   }
   if(core?.theme)core.theme.subscribe(()=>applyTheme());
   else{const colorScheme=window.matchMedia('(prefers-color-scheme: dark)');if(colorScheme.addEventListener)colorScheme.addEventListener('change',()=>{if(themePreference==='system')applyTheme()});else if(colorScheme.addListener)colorScheme.addListener(()=>{if(themePreference==='system')applyTheme()})}
   const setLanguage=next=>{
-    if(next!==language){language=next;try{localStorage.setItem('dawaya-language',language)}catch(_){}applyLanguage()}
+    if(next!==language){language=next;try{localStorage.setItem('drugcopeia-ai-language',language)}catch(_){}applyLanguage()}
   };
   $('#loadMore').addEventListener('click',()=>{shown+=responsivePageSize('medicine');render()});
   $('#labTestSearch').addEventListener('input',()=>{labSelectedTest='';labSelectedLetter='';renderLabCatalog();renderLabSuggestions(true)});
@@ -4191,7 +4191,7 @@ const CONDITION_SUBGROUPS={
   const PRIVACY_HOST_LABELS={'www.who.int':'privacyHostWho','api.fda.gov':'privacyHostFda','eutils.ncbi.nlm.nih.gov':'privacyHostNlm','commons.wikimedia.org':'privacyHostCommons','thumb.wikimedia.org':'privacyHostCommonsImage','upload.wikimedia.org':'privacyHostCommonsFull'};
   function privacyKeys(){
     const cfg=window.DAWAYA_PRIVACY_CONFIG,store=cfg&&cfg.storage;
-    const keys=[...(store&&Array.isArray(store.localUserDataKeys)?store.localUserDataKeys:['dawaya-reminders-v1','dawaya-reminder-taken-v1','dawaya-custom-drugs-v1','dawaya-ai-chat-v1','dawaya-ai-model-state-v1','dawaya-ai-settings-v1','dawaya-calc-history','dawaya-study-stats']),'dawaya-news-v1'];
+    const keys=[...(store&&Array.isArray(store.localUserDataKeys)?store.localUserDataKeys:['drugcopeia-ai-reminders-v1','drugcopeia-ai-reminder-taken-v1','drugcopeia-ai-custom-drugs-v1','drugcopeia-ai-ai-chat-v1','drugcopeia-ai-ai-model-state-v1','drugcopeia-ai-ai-settings-v1','drugcopeia-ai-calc-history','drugcopeia-ai-study-stats']),'drugcopeia-ai-news-v1'];
     return [...new Set(keys)];
   }
   /* The Google photograph card was retired in 1.7.7, and a key pasted into it has no
@@ -5535,7 +5535,7 @@ const CONDITION_SUBGROUPS={
   (function(){
     let params;try{params=new URLSearchParams(location.search)}catch(_){return}
     const langParam=params.get('lang');
-    if(langParam==='ar'||langParam==='en'){language=langParam;try{localStorage.setItem('dawaya-language',langParam)}catch(_){}}
+    if(langParam==='ar'||langParam==='en'){language=langParam;try{localStorage.setItem('drugcopeia-ai-language',langParam)}catch(_){}}
     const themeParam=params.get('theme');
     if(themeParam==='dark'||themeParam==='light'){themePreference=themeParam;try{core?.theme?.setPreference(themeParam)}catch(_){}}
     if(params.get('page')==='pregnancy'){

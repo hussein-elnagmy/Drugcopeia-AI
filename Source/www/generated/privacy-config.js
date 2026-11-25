@@ -12,7 +12,7 @@
   },
   "version": 2,
   "defaultOffline": false,
-  "offlineKey": "dawaya-offline-mode",
+  "offlineKey": "drugcopeia-ai-offline-mode",
   "allowedHosts": [
     {
       "host": "www.who.int",
@@ -161,21 +161,21 @@
   ],
   "storage": {
     "localUserDataKeys": [
-      "dawaya-reminders-v1",
-      "dawaya-reminder-taken-v1",
-      "dawaya-custom-drugs-v1",
-      "dawaya-ai-chat-v1",
-      "dawaya-calc-history",
-      "dawaya-study-stats"
+      "drugcopeia-ai-reminders-v1",
+      "drugcopeia-ai-reminder-taken-v1",
+      "drugcopeia-ai-custom-drugs-v1",
+      "drugcopeia-ai-ai-chat-v1",
+      "drugcopeia-ai-calc-history",
+      "drugcopeia-ai-study-stats"
     ],
     "plaintextAllowedKeys": [
-      "dawaya-theme",
-      "dawaya-language",
-      "dawaya-type-scale",
-      "dawaya-offline-mode",
-      "dawaya-news-v1",
-      "dawaya-ai-model-state-v1",
-      "dawaya-ai-settings-v1"
+      "drugcopeia-ai-theme",
+      "drugcopeia-ai-language",
+      "drugcopeia-ai-type-scale",
+      "drugcopeia-ai-offline-mode",
+      "drugcopeia-ai-news-v1",
+      "drugcopeia-ai-ai-model-state-v1",
+      "drugcopeia-ai-ai-settings-v1"
     ]
   }
 });

@@ -13,10 +13,10 @@
   'use strict';
 
   const KEYS = {
-    theme: 'dawaya-theme',
-    typeScale: 'dawaya-type-scale',
-    reminders: 'dawaya-reminders-v1',
-    reminderTaken: 'dawaya-reminder-taken-v1'
+    theme: 'drugcopeia-ai-theme',
+    typeScale: 'drugcopeia-ai-type-scale',
+    reminders: 'drugcopeia-ai-reminders-v1',
+    reminderTaken: 'drugcopeia-ai-reminder-taken-v1'
   };
   const TYPE_STEPS = [0.9, 1, 1.1, 1.2, 1.3];
   const REMINDER_LIMIT = 20;

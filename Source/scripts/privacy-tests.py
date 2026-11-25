@@ -305,7 +305,7 @@ TEST_PAGE = r"""<!doctype html>
       await wait(200);
     }
     record('turning saving off from privacy erases the saved key',
-      privacy.historyEnabled() === false && localStorage.getItem('dawaya-ai-chat-v1') === null);
+      privacy.historyEnabled() === false && localStorage.getItem('drugcopeia-ai-ai-chat-v1') === null);
     if (historyToggle) {
       historyToggle.checked = true;
       historyToggle.dispatchEvent(new Event('change', { bubbles: true }));
@@ -333,9 +333,9 @@ TEST_PAGE = r"""<!doctype html>
       localStorage.getItem('dawaya-photo-search-v1') === null,
       localStorage.getItem('dawaya-photo-search-v1'));
 
-    localStorage.setItem('dawaya-reminders-v1', '[{"id":"t1","name":"Test medicine","dose":"1 tablet","time":"09:00"}]');
-    localStorage.setItem('dawaya-reminder-taken-v1', '{"2026-10-29":["t1"]}');
-    localStorage.setItem('dawaya-custom-drugs-v1', '[{"id":"c1","name":"Test"}]');
+    localStorage.setItem('drugcopeia-ai-reminders-v1', '[{"id":"t1","name":"Test medicine","dose":"1 tablet","time":"09:00"}]');
+    localStorage.setItem('drugcopeia-ai-reminder-taken-v1', '{"2026-10-29":["t1"]}');
+    localStorage.setItem('drugcopeia-ai-custom-drugs-v1', '[{"id":"c1","name":"Test"}]');
 
     var doc = frame.contentDocument;
     var trigger = doc.querySelector('[data-app-nav="privacy"]');
@@ -349,11 +349,11 @@ TEST_PAGE = r"""<!doctype html>
       wipe.click();
       await wait(200);
     }
-    record('delete-all removes reminders', localStorage.getItem('dawaya-reminders-v1') === null);
-    record('delete-all removes the taken log', localStorage.getItem('dawaya-reminder-taken-v1') === null);
-    record('delete-all removes custom drugs', localStorage.getItem('dawaya-custom-drugs-v1') === null);
-    record('delete-all removes the news snapshot', localStorage.getItem('dawaya-news-v1') === null);
-    record('delete-all removes saved conversations', localStorage.getItem('dawaya-ai-chat-v1') === null);
+    record('delete-all removes reminders', localStorage.getItem('drugcopeia-ai-reminders-v1') === null);
+    record('delete-all removes the taken log', localStorage.getItem('drugcopeia-ai-reminder-taken-v1') === null);
+    record('delete-all removes custom drugs', localStorage.getItem('drugcopeia-ai-custom-drugs-v1') === null);
+    record('delete-all removes the news snapshot', localStorage.getItem('drugcopeia-ai-news-v1') === null);
+    record('delete-all removes saved conversations', localStorage.getItem('drugcopeia-ai-ai-chat-v1') === null);
 
     finish();
   }
@@ -405,7 +405,7 @@ HISTORY_TEST_PAGE = r"""<!doctype html>
 
     await privacy.record('user', 'asthma test question');
     await privacy.record('assistant', 'reference answer', { type: 'answer' });
-    var saved = localStorage.getItem('dawaya-ai-chat-v1');
+    var saved = localStorage.getItem('drugcopeia-ai-ai-chat-v1');
     record('stored conversation is a ciphertext envelope',
       Boolean(saved) && saved.indexOf('v1.webaesgcm.') === 0 && saved.indexOf('asthma') === -1,
       String(saved || '').slice(0, 20));
@@ -431,23 +431,23 @@ HISTORY_TEST_PAGE = r"""<!doctype html>
 
     privacy.setHistoryEnabled(false);
     record('turning saving off clears storage and memory',
-      privacy.historyEnabled() === false && localStorage.getItem('dawaya-ai-chat-v1') === null &&
+      privacy.historyEnabled() === false && localStorage.getItem('drugcopeia-ai-ai-chat-v1') === null &&
       (await privacy.listSessions()).length === 0);
     record('nothing is recorded while saving is off',
       (await privacy.record('user', 'ignored')).persisted === false &&
-      localStorage.getItem('dawaya-ai-chat-v1') === null);
+      localStorage.getItem('drugcopeia-ai-ai-chat-v1') === null);
     privacy.setHistoryEnabled(true);
 
     await privacy.close();
-    localStorage.setItem('dawaya-ai-chat-v1', JSON.stringify([{ role: 'user', text: 'legacy question', at: 1700000000000 }]));
+    localStorage.setItem('drugcopeia-ai-ai-chat-v1', JSON.stringify([{ role: 'user', text: 'legacy question', at: 1700000000000 }]));
     var legacy = await privacy.load();
-    var migrated = localStorage.getItem('dawaya-ai-chat-v1');
+    var migrated = localStorage.getItem('drugcopeia-ai-ai-chat-v1');
     record('an older flat transcript is migrated and encrypted',
       legacy.length === 1 && legacy[0].text === 'legacy question' &&
       Boolean(migrated) && migrated.indexOf('v1.webaesgcm.') === 0 && migrated.indexOf('legacy question') === -1);
 
     await privacy.clearHistory();
-    record('clear all removes the stored conversations', localStorage.getItem('dawaya-ai-chat-v1') === null);
+    record('clear all removes the stored conversations', localStorage.getItem('drugcopeia-ai-ai-chat-v1') === null);
     send();
   }
 

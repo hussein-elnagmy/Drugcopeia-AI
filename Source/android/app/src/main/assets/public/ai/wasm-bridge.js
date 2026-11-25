@@ -22,7 +22,7 @@
   'use strict';
 
   const LISTENER_KEY = '__dawayaLLMEvent';
-  const STORE_DIR = 'dawaya-models';
+  const STORE_DIR = 'drugcopeia-ai-models';
   const PROGRESS_MS = 400;
 
   let wllamaModule = null;      // the vendored ESM, imported lazily on first use

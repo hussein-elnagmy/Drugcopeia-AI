@@ -103,12 +103,12 @@ enum SecureStore {
     /// rejected here so a bug in the page cannot shove health data into the Keychain
     /// under an unexpected key.
     static let secureOnlyKeys: Set<String> = [
-        "dawaya-reminders-v1",
-        "dawaya-reminder-taken-v1",
-        "dawaya-custom-drugs-v1",
-        "dawaya-ai-chat-v1",
-        "dawaya-calc-history",
-        "dawaya-study-stats"
+        "drugcopeia-ai-reminders-v1",
+        "drugcopeia-ai-reminder-taken-v1",
+        "drugcopeia-ai-custom-drugs-v1",
+        "drugcopeia-ai-ai-chat-v1",
+        "drugcopeia-ai-calc-history",
+        "drugcopeia-ai-study-stats"
     ]
 
     static func isAllowedKey(_ key: String) -> Bool { secureOnlyKeys.contains(key) }
@@ -374,7 +374,7 @@ struct MacReminder {
 }
 
 /// Schedules daily local notifications for the reminders stored by the web
-/// layer in `localStorage["dawaya-reminders-v1"]`.
+/// layer in `localStorage["drugcopeia-ai-reminders-v1"]`.
 final class MacReminderService: NSObject, UNUserNotificationCenterDelegate {
     static let shared = MacReminderService()
     static let reminderPrefix = "dawaya.reminder."
@@ -922,7 +922,7 @@ final class NativeBridge: NSObject, WKScriptMessageHandlerWithReply {
           } catch (error) { return false; }
         }
       };
-      var REMINDER_KEY = 'dawaya-reminders-v1', TAKEN_KEY = 'dawaya-reminder-taken-v1', MAX_REMINDERS = 20;
+      var REMINDER_KEY = 'drugcopeia-ai-reminders-v1', TAKEN_KEY = 'drugcopeia-ai-reminder-taken-v1', MAX_REMINDERS = 20;
       var knownReminderIds = {}, reminderNeedsPermission = false, reminderSyncTimer = 0, lastReminderSignature = '';
       function takenToday() {
         try {

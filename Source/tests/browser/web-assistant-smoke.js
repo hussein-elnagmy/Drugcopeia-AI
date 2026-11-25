@@ -27,7 +27,7 @@ async function ask(p,q,tag,maxMs=600000){
  const ud='/tmp/prof-'+Date.now();
  const b=await puppeteer.launch({executablePath:'/usr/bin/google-chrome',headless:'new',userDataDir:ud,args:['--no-sandbox','--disable-dev-shm-usage','--host-resolver-rules=MAP drug.test 127.0.0.1','--unsafely-treat-insecure-origin-as-secure=http://drug.test:8181'],defaultViewport:{width:430,height:900}});
  const p=await b.newPage();watch(p,'main');
- await p.evaluateOnNewDocument(()=>{Object.defineProperty(Navigator.prototype,'deviceMemory',{get:()=>8});try{localStorage.getItem('dawaya-language')||localStorage.setItem('dawaya-language','en')}catch(_){}});
+ await p.evaluateOnNewDocument(()=>{Object.defineProperty(Navigator.prototype,'deviceMemory',{get:()=>8});try{localStorage.getItem('drugcopeia-ai-language')||localStorage.setItem('drugcopeia-ai-language','en')}catch(_){}});
  await p.goto(BASE,{waitUntil:'load'});await sleep(4000);
  log('loaded; SW controller',await p.evaluate(()=>!!navigator.serviceWorker.controller),'crossOriginIsolated',await p.evaluate(()=>crossOriginIsolated));
  await openAssistant(p);await p.screenshot({path:S+'01-assistant-fresh.png'});log('state',JSON.stringify(await state(p)));
@@ -48,7 +48,7 @@ async function ask(p,q,tag,maxMs=600000){
  const q3=await ask(p,'Who won the football World Cup in 2018?','12-offtopic-worldcup');
  fs.writeFileSync(S+'drafts-en.json',JSON.stringify(await p.evaluate(()=>window.__drafts),null,1));
  // Arabic UI
- await p.evaluate(()=>{localStorage.setItem('dawaya-language','ar')});await p.reload({waitUntil:'load'});await sleep(4000);
+ await p.evaluate(()=>{localStorage.setItem('drugcopeia-ai-language','ar')});await p.reload({waitUntil:'load'});await sleep(4000);
  await openAssistant(p);await sleep(6000);log('ar state',JSON.stringify(await state(p)));await p.evaluate(HOOK);
  await p.screenshot({path:S+'13-ar-ui-assistant.png'});
  const q4=await ask(p,'ما هي الآثار الجانبية لدواء كونكور؟','14-ask-ar-ui-concor');

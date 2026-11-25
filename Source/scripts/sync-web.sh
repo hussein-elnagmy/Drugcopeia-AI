@@ -22,9 +22,9 @@ cp "$BRIDGE" "$WWW/ios-shell.js"
 import re, sys
 html_path, sw_path = sys.argv[1], sys.argv[2]
 sw = open(sw_path, encoding='utf-8').read()
-match = re.search(r'dawaya-shell-v(\d+)', sw)
+match = re.search(r'drugcopeia-ai-shell-v(\d+)', sw)
 if not match:
-    raise SystemExit('service-worker.js has no dawaya-shell-vN cache name')
+    raise SystemExit('service-worker.js has no drugcopeia-ai-shell-vN cache name')
 version = match.group(1)
 sw = re.sub(r'\?v=\d+', f'?v={version}', sw)
 open(sw_path, 'w', encoding='utf-8').write(sw)

@@ -35,12 +35,12 @@ enum DawayaSecureStore {
 
     /// `storage.localUserDataKeys` from privacy.config.json.
     static let allowedKeys: Set<String> = [
-        "dawaya-reminders-v1",
-        "dawaya-reminder-taken-v1",
-        "dawaya-custom-drugs-v1",
-        "dawaya-ai-chat-v1",
-        "dawaya-calc-history",
-        "dawaya-study-stats"
+        "drugcopeia-ai-reminders-v1",
+        "drugcopeia-ai-reminder-taken-v1",
+        "drugcopeia-ai-custom-drugs-v1",
+        "drugcopeia-ai-ai-chat-v1",
+        "drugcopeia-ai-calc-history",
+        "drugcopeia-ai-study-stats"
     ]
 
     /// Keychain items are meant to be small; reminders/history JSON stays far

@@ -1206,7 +1206,7 @@
     const net = global.DawayaNet;
     if (net && typeof net.isOffline === 'function') return net.isOffline();
     return global.DawayaCore && global.DawayaCore.storage
-      ? global.DawayaCore.storage.get('dawaya-offline-mode', 'on') !== 'off'
+      ? global.DawayaCore.storage.get('drugcopeia-ai-offline-mode', 'on') !== 'off'
       : true;
   }
 

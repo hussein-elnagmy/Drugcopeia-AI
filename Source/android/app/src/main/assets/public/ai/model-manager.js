@@ -55,13 +55,13 @@
 
   function stored() {
     if (!storage) return {};
-    const key = (config && config.paths && config.paths.stateKey) || 'dawaya-ai-model-state-v1';
+    const key = (config && config.paths && config.paths.stateKey) || 'drugcopeia-ai-ai-model-state-v1';
     return storage.json(key, {}) || {};
   }
 
   function persist(patch) {
     if (!storage) return;
-    const key = (config && config.paths && config.paths.stateKey) || 'dawaya-ai-model-state-v1';
+    const key = (config && config.paths && config.paths.stateKey) || 'drugcopeia-ai-ai-model-state-v1';
     const next = { ...stored(), ...patch, modelVersion: config && config.model ? config.model.version : 0 };
     storage.set(key, JSON.stringify(next));
   }

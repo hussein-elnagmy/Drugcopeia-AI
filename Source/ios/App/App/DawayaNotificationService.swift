@@ -69,7 +69,7 @@ struct DawayaReminder: Equatable {
 }
 
 /// Schedules daily local notifications for the medication reminders saved by
-/// the web layer in `localStorage["dawaya-reminders-v1"]`.
+/// the web layer in `localStorage["drugcopeia-ai-reminders-v1"]`.
 ///
 /// Permission is requested only when the user actively adds or edits a
 /// reminder (`requestAuthorization == true`), never on a silent background sync.

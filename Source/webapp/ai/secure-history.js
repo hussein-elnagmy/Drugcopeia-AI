@@ -19,14 +19,14 @@
    * pipeline cannot persist anything without going through here.
    */
 
-  var HISTORY_KEY = 'dawaya-ai-chat-v1';
-  var CUSTOM_DRUGS_KEY = 'dawaya-custom-drugs-v1';
-  var REMINDERS_KEY = 'dawaya-reminders-v1';
-  var REMINDERS_TAKEN_KEY = 'dawaya-reminder-taken-v1';
-  var QUERY_HISTORY_KEY = 'dawaya-query-history';
+  var HISTORY_KEY = 'drugcopeia-ai-ai-chat-v1';
+  var CUSTOM_DRUGS_KEY = 'drugcopeia-ai-custom-drugs-v1';
+  var REMINDERS_KEY = 'drugcopeia-ai-reminders-v1';
+  var REMINDERS_TAKEN_KEY = 'drugcopeia-ai-reminder-taken-v1';
+  var QUERY_HISTORY_KEY = 'drugcopeia-ai-query-history';
 
-  var MEMORY_KEY = 'dawaya-remember-queries';
-  var AUTO_DELETE_KEY = 'dawaya-auto-delete-history';
+  var MEMORY_KEY = 'drugcopeia-ai-remember-queries';
+  var AUTO_DELETE_KEY = 'drugcopeia-ai-auto-delete-history';
   var HEALTH_KEYS = [HISTORY_KEY, QUERY_HISTORY_KEY, CUSTOM_DRUGS_KEY, REMINDERS_KEY, REMINDERS_TAKEN_KEY];
 
   function store() {
@@ -80,7 +80,7 @@
     return name !== 'webcrypto-local';
   }
 
-  var KEY_STORE_DB = 'dawaya-privacy-key';
+  var KEY_STORE_DB = 'drugcopeia-ai-privacy-key';
   var KEY_STORE_OBJECT = 'keys';
   var KEY_RECORD = 'history-aes-gcm';
 
@@ -261,7 +261,7 @@
       var prefixKeys = [];
       for (var j = 0; j < s.length; j++) {
         var name = s.key(j);
-        if (name && String(name).indexOf('dawaya-') === 0) prefixKeys.push(name);
+        if (name && String(name).indexOf('drugcopeia-ai-') === 0) prefixKeys.push(name);
       }
       prefixKeys.forEach(function (name) {
         if (keepUiSettings && !isHealthKey(name)) return;

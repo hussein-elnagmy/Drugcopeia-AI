@@ -3,7 +3,7 @@
   "generatedNote": "Single source of truth for Dawaya privacy enforcement. Read by scripts/privacy-check.py (build gate) and scripts/gen-privacy-config.py, which emits webapp/generated/privacy-config.js and android/app/src/main/res/xml/network_security_config.xml. Changing anything here is a privacy decision and must be reviewed.",
   "network": {
     "defaultOffline": false,
-    "offlineKey": "dawaya-offline-mode",
+    "offlineKey": "drugcopeia-ai-offline-mode",
     "allowedHosts": [
       {
         "host": "www.who.int",
@@ -353,28 +353,28 @@
   },
   "storage": {
     "plaintextAllowedKeys": [
-      "dawaya-theme",
-      "dawaya-language",
-      "dawaya-type-scale",
-      "dawaya-offline-mode",
-      "dawaya-news-v1",
-      "dawaya-ai-model-state-v1",
-      "dawaya-ai-settings-v1"
+      "drugcopeia-ai-theme",
+      "drugcopeia-ai-language",
+      "drugcopeia-ai-type-scale",
+      "drugcopeia-ai-offline-mode",
+      "drugcopeia-ai-news-v1",
+      "drugcopeia-ai-ai-model-state-v1",
+      "drugcopeia-ai-ai-settings-v1"
     ],
     "localUserDataKeys": [
-      "dawaya-reminders-v1",
-      "dawaya-reminder-taken-v1",
-      "dawaya-custom-drugs-v1",
-      "dawaya-ai-chat-v1",
-      "dawaya-calc-history",
-      "dawaya-study-stats"
+      "drugcopeia-ai-reminders-v1",
+      "drugcopeia-ai-reminder-taken-v1",
+      "drugcopeia-ai-custom-drugs-v1",
+      "drugcopeia-ai-ai-chat-v1",
+      "drugcopeia-ai-calc-history",
+      "drugcopeia-ai-study-stats"
     ],
     "neverPersist": [
       "any chat message or assistant answer in the clear: conversation saving is on by default, the stored copy is always a ciphertext envelope (Keychain / Android Keystore / DPAPI, or a WebCrypto AES-GCM envelope on Windows and the web), and turning saving off in Privacy erases every saved conversation",
       "any patient identifier: name, phone number, national ID, address, email",
       "the text of a search query"
     ],
-    "note": "Keys in localUserDataKeys hold data the user typed or scheduled. They stay in app-private storage, are excluded from Android cloud backup and device transfer, are never read by any network code, and are erased by Privacy > Delete all local data. No key outside these lists may be written to localStorage. dawaya-ai-chat-v1 only ever holds a ciphertext envelope produced by ai/secure-history.js; the plaintext of a chat never goes to localStorage."
+    "note": "Keys in localUserDataKeys hold data the user typed or scheduled. They stay in app-private storage, are excluded from Android cloud backup and device transfer, are never read by any network code, and are erased by Privacy > Delete all local data. No key outside these lists may be written to localStorage. drugcopeia-ai-ai-chat-v1 only ever holds a ciphertext envelope produced by ai/secure-history.js; the plaintext of a chat never goes to localStorage."
   },
   "history": {
     "defaultEnabled": true,

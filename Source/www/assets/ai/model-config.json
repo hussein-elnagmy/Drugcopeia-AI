@@ -96,9 +96,9 @@
   "paths": {
     "comment": "App-private storage only. iOS/macOS: Application Support/Dawaya/models. Android: getNoBackupFilesDir or filesDir. Windows: %LOCALAPPDATA%\\Dawaya\\models.",
     "directoryName": "models",
-    "stateKey": "dawaya-ai-model-state-v1",
-    "chatHistoryKey": "dawaya-ai-chat-v1",
-    "settingsKey": "dawaya-ai-settings-v1"
+    "stateKey": "drugcopeia-ai-ai-model-state-v1",
+    "chatHistoryKey": "drugcopeia-ai-ai-chat-v1",
+    "settingsKey": "drugcopeia-ai-ai-settings-v1"
   },
   "web": {
     "comment": "The web/PWA runtime: llama.cpp compiled to WebAssembly (wllama, MIT), vendored untouched so the browser build has no CDN and no account. The pinned hashes are enforced by scripts/privacy-check.py; keep them and ai/vendor/wllama/README.txt in sync when upgrading. Threads need cross-origin isolation; without it the model still runs single-threaded. The Safari build (compat) is local too, never the jsDelivr fallback.",

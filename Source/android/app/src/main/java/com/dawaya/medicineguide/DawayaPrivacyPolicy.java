@@ -148,24 +148,24 @@ public final class DawayaPrivacyPolicy {
 
     /** privacy.config.json -> storage.localUserDataKeys: user-entered content, app-private. */
     public static final Set<String> SECURE_ONLY_KEYS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-        "dawaya-reminders-v1",
-        "dawaya-reminder-taken-v1",
-        "dawaya-custom-drugs-v1",
-        "dawaya-ai-chat-v1",
-        "dawaya-calc-history",
-        "dawaya-study-stats"
+        "drugcopeia-ai-reminders-v1",
+        "drugcopeia-ai-reminder-taken-v1",
+        "drugcopeia-ai-custom-drugs-v1",
+        "drugcopeia-ai-ai-chat-v1",
+        "drugcopeia-ai-calc-history",
+        "drugcopeia-ai-study-stats"
     )));
 
     /** privacy.config.json -> storage.plaintextAllowedKeys: UI settings, nothing typed. */
     public static final Set<String> PLAINTEXT_ALLOWED_KEYS = Collections.unmodifiableSet(
         new HashSet<>(Arrays.asList(
-            "dawaya-theme",
-            "dawaya-language",
-            "dawaya-type-scale",
-            "dawaya-offline-mode",
-            "dawaya-news-v1",
-            "dawaya-ai-model-state-v1",
-            "dawaya-ai-settings-v1"
+            "drugcopeia-ai-theme",
+            "drugcopeia-ai-language",
+            "drugcopeia-ai-type-scale",
+            "drugcopeia-ai-offline-mode",
+            "drugcopeia-ai-news-v1",
+            "drugcopeia-ai-ai-model-state-v1",
+            "drugcopeia-ai-ai-settings-v1"
         ))
     );
 

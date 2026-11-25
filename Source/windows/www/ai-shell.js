@@ -100,7 +100,7 @@
     box.appendChild(navItem(n.fb,function(){closeMenu();window.alert(tx().feedback)}));
     box.appendChild(navItem(n.about,function(){openOther('about')}));
     box.appendChild(navItem(n.priv,function(){openOther('privacy')}));
-    box.appendChild(navItem(n.lang,function(){try{localStorage.setItem('dawaya-language',lang()==='ar'?'en':'ar')}catch(_){}location.reload()}));
+    box.appendChild(navItem(n.lang,function(){try{localStorage.setItem('drugcopeia-ai-language',lang()==='ar'?'en':'ar')}catch(_){}location.reload()}));
     body.insertBefore(box,body.firstChild);
   }
 

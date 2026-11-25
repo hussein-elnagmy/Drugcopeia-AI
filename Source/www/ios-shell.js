@@ -26,8 +26,8 @@
   if (!cap || typeof cap.isNativePlatform !== 'function' || !cap.isNativePlatform()) return;
 
   const PLUGIN_NAME = 'DawayaShell';
-  const REMINDER_KEY = 'dawaya-reminders-v1';
-  const TAKEN_KEY = 'dawaya-reminder-taken-v1';
+  const REMINDER_KEY = 'drugcopeia-ai-reminders-v1';
+  const TAKEN_KEY = 'drugcopeia-ai-reminder-taken-v1';
   const MAX_REMINDERS = 20;
 
   function plugin() {
