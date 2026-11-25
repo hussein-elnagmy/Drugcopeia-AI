@@ -45,7 +45,7 @@
   function buildWelcome(){
     var t=tx();
     var w=el('section','ai-welcome');
-    w.appendChild(el('div','ai-welcome-mark','D'));
+    var wm=el('div','ai-welcome-mark','');wm.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-dawaya-ai"></use></svg>';w.appendChild(wm);
     var h=el('h1','',t.hello);w.appendChild(h);
     w.appendChild(el('p','',t.sub));
     var c=el('div','ai-chips');

@@ -82,7 +82,7 @@
   function avatar(){
     var src=doc.querySelector('.ai-msg-bot .ai-avatar');
     if(src)return src.cloneNode(true);
-    var a=el('span','ai-avatar','D');a.setAttribute('aria-hidden','true');return a;
+    var a=el('span','ai-avatar','');a.innerHTML='<svg viewBox="0 0 24 24"><use href="#icon-dawaya-ai"></use></svg>';a.setAttribute('aria-hidden','true');return a;
   }
   function botShell(){
     var art=el('article','ai-msg ai-msg-bot ai-tool-msg');art.dataset.role='assistant';
@@ -290,4 +290,119 @@
     doc.addEventListener('keydown',function(e){if(e.key==='Escape')closeOverlay()});
   }
   if(doc.readyState==='loading')doc.addEventListener('DOMContentLoaded',boot);else boot();
+})();
+
+/* Composer tools: voice and barcode, next to the photo button. They only fill the
+   question; the answer, sources and doctor note come from the normal pipeline. */
+(function(){
+  'use strict';
+  var doc=document,root=doc.documentElement;
+  var ar=function(){return root.lang!=='en'};
+  var L={
+    ar:{mic:'بحث بالصوت',scan:'مسح باركود',scanTitle:'امسح باركود العلبة',manual:'اكتب أرقام الباركود',go:'بحث',close:'إغلاق',
+      noCam:'الكاميرا أو قارئ الباركود غير متاح هنا. اكتب الأرقام يدويا.',noHit:'الباركود ده مش موجود في قاعدة البيانات على الجهاز.',
+      listen:'بسمعك...',noVoice:'البحث بالصوت غير متاح على هذا الجهاز.',noSpeech:'ماسمعتش حاجة.',
+      q:function(n){return 'ما هو دواء '+n+' وما استخداماته وبدائله؟'}},
+    en:{mic:'Voice search',scan:'Scan barcode',scanTitle:'Scan the box barcode',manual:'Type the barcode digits',go:'Search',close:'Close',
+      noCam:'Camera or barcode reader is not available here. Type the digits instead.',noHit:'This barcode is not in the on-device database.',
+      listen:'Listening...',noVoice:'Voice search is not available on this device.',noSpeech:'I did not hear anything.',
+      q:function(n){return 'What is '+n+' and what is it used for? Alternatives?'}}
+  };
+  var tx=function(){return L[ar()?'ar':'en']};
+  var ICON={
+    mic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
+    scan:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 9v6M10 9v6M14 9v6M17 9v6"/></svg>'
+  };
+  function ask(q){
+    var i=doc.getElementById('aiInput'),f=doc.getElementById('aiComposer');if(!i||!f)return;
+    i.value=q;i.dispatchEvent(new Event('input',{bubbles:true}));
+    if(f.requestSubmit)f.requestSubmit();else f.dispatchEvent(new Event('submit',{cancelable:true,bubbles:true}));
+  }
+  function note(msg){
+    var h=doc.getElementById('aiHint');if(!h)return;h.textContent=msg;clearTimeout(note.t);note.t=setTimeout(function(){if(h.textContent===msg)h.textContent=''},5000);
+  }
+  var table=null;
+  function loadTable(){
+    if(table)return Promise.resolve(table);
+    return fetch('assets/barcode-index.json',{cache:'force-cache'}).then(function(r){return r.ok?r.json():null}).then(function(d){table=d&&d.codes?d.codes:{};return table}).catch(function(){table={};return table});
+  }
+  function resolveCode(code){
+    var digits=String(code||'').replace(/\D/g,'');if(digits.length<8){note(tx().noHit);return}
+    loadTable().then(function(t){
+      var P=window.DawayaAIPhoto,names=P&&P.namesForCode?P.namesForCode(digits,t):[];
+      if(names&&names.length)ask(tx().q(names[0]));else note(tx().noHit);
+    });
+  }
+  function closeOv(){var o=doc.getElementById('aiScanOv');if(o){if(o._stream)o._stream.getTracks().forEach(function(t){t.stop()});o._stop=true;o.remove()}}
+  function openScan(){
+    var b=window.DawayaNative;
+    if(b&&typeof b.scanCode==='function'){
+      Promise.resolve(b.scanCode({language:ar()?'ar':'en'})).then(function(r){if(r&&r.code)resolveCode(r.code);else if(r&&!r.cancelled)manual(true)}).catch(function(){manual(true)});
+      return;
+    }
+    manual(false);
+  }
+  function manual(failed){
+    closeOv();
+    var o=doc.createElement('div');o.className='ai-scan-ov';o.id='aiScanOv';
+    var box=doc.createElement('div');box.className='ai-scan-box';
+    var h=doc.createElement('strong');h.textContent=tx().scanTitle;box.appendChild(h);
+    var v=doc.createElement('video');v.setAttribute('playsinline','');v.muted=true;v.hidden=true;box.appendChild(v);
+    var p=doc.createElement('p');p.className='ai-scan-note';box.appendChild(p);
+    var f=doc.createElement('form'),inp=doc.createElement('input'),go=doc.createElement('button');
+    inp.inputMode='numeric';inp.placeholder=tx().manual;go.type='submit';go.textContent=tx().go;f.appendChild(inp);f.appendChild(go);box.appendChild(f);
+    var cl=doc.createElement('button');cl.type='button';cl.textContent=tx().close;box.appendChild(cl);
+    o.appendChild(box);doc.body.appendChild(o);
+    cl.onclick=closeOv;o.addEventListener('click',function(e){if(e.target===o)closeOv()});
+    f.onsubmit=function(e){e.preventDefault();var c=inp.value;closeOv();resolveCode(c)};
+    if(failed)p.textContent=tx().noCam;
+    var ok=!failed&&typeof window.BarcodeDetector==='function'&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia;
+    if(!ok){if(!failed)p.textContent=tx().noCam;inp.focus();return}
+    var det;try{det=new window.BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e','code_128','qr_code']})}catch(_){p.textContent=tx().noCam;return}
+    navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false}).then(function(s){
+      if(o._stop){s.getTracks().forEach(function(t){t.stop()});return}
+      o._stream=s;v.srcObject=s;v.hidden=false;v.play().catch(function(){});
+      (function tick(){
+        if(o._stop)return;
+        det.detect(v).then(function(r){if(r&&r.length&&r[0].rawValue){var c=r[0].rawValue;closeOv();resolveCode(c)}else setTimeout(tick,350)}).catch(function(){setTimeout(tick,500)});
+      })();
+    }).catch(function(){p.textContent=tx().noCam;inp.focus()});
+  }
+  var rec=null;
+  function mic(btn){
+    var b=window.DawayaNative,lang=ar()?'ar-EG':'en-US';
+    if(rec){try{rec.stop()}catch(_){}return}
+    function done(){btn.classList.remove('is-listening');rec=null}
+    if(b&&typeof b.startVoiceSearch==='function'){
+      btn.classList.add('is-listening');note(tx().listen);
+      Promise.resolve(b.startVoiceSearch({language:lang})).then(function(r){done();if(r&&r.text)ask(r.text);else note(tx().noSpeech)}).catch(function(){done();note(tx().noVoice)});
+      return;
+    }
+    var R=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!R){note(tx().noVoice);return}
+    var r;try{r=new R()}catch(_){note(tx().noVoice);return}
+    r.lang=lang;r.interimResults=false;r.continuous=false;rec=r;btn.classList.add('is-listening');note(tx().listen);
+    var got='';
+    r.onresult=function(e){for(var i=e.resultIndex;i<e.results.length;i++){if(e.results[i][0]&&e.results[i][0].transcript)got=e.results[i][0].transcript.trim()}};
+    r.onerror=function(){done();note(tx().noVoice)};
+    r.onend=function(){var g=got;done();if(g)ask(g);else note(tx().noSpeech)};
+    try{r.start()}catch(_){done();note(tx().noVoice)}
+  }
+  function mk(cls,key,icon,fn){
+    var b=doc.createElement('button');b.type='button';b.className='ai-tool '+cls;b.innerHTML=icon;
+    b.setAttribute('aria-label',tx()[key]);b.title=tx()[key];b.addEventListener('click',function(){fn(b)});return b;
+  }
+  function install(){
+    var bar=doc.querySelector('#aiComposer .ai-composer-bar'),send=doc.getElementById('aiSend');
+    if(!bar||!send||doc.getElementById('aiScanBtn'))return;
+    var s=mk('','scan',ICON.scan,openScan);s.id='aiScanBtn';
+    var m=mk('','mic',ICON.mic,mic);m.id='aiMicBtn';
+    var at=doc.getElementById('aiAttach');
+    var ref=doc.getElementById('aiHint')||send;
+    bar.insertBefore(s,ref);bar.insertBefore(m,ref);
+    if(at)bar.insertBefore(at,s);
+  }
+  function relabel(){['aiScanBtn','aiMicBtn'].forEach(function(id){var b=doc.getElementById(id);if(b){var k=id==='aiScanBtn'?'scan':'mic';b.setAttribute('aria-label',tx()[k]);b.title=tx()[k]}})}
+  if(doc.readyState==='loading')doc.addEventListener('DOMContentLoaded',install);else install();
+  setTimeout(install,1500);setTimeout(install,4000);setInterval(relabel,5000);
 })();
