@@ -30,6 +30,8 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: Source/www
+      - name: Wait for the uploaded Pages artifact to be indexed
+        run: sleep 45
       - id: d
         uses: actions/deploy-pages@v4
       - name: Every service worker shell URL must return 200 on Pages
