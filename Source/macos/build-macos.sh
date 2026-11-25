@@ -7,7 +7,7 @@ set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
 BUILD="$ROOT/build/macos"
-APP="$BUILD/Dawaya.app"
+APP="$BUILD/DrugcopeiaAI.app"
 CONTENTS="$APP/Contents"
 # Prefer the synced www/ output: scripts/sync-web.sh rewrites the ?v= cache
 # busting there, and webapp/ still carries the previous revision.
@@ -78,7 +78,7 @@ xcrun --sdk macosx swiftc -O -whole-module-optimization \
   -F "$FRAMEWORK_SEARCH" -framework llama \
   -Xlinker -rpath -Xlinker @executable_path/../Frameworks \
   -framework Cocoa -framework WebKit -framework Network -framework Security -framework UserNotifications -framework Vision \
-  -o "$BUILD/Dawaya-x86_64" "${SRC[@]}"
+  -o "$BUILD/DrugcopeiaAI-x86_64" "${SRC[@]}"
 
 echo "Compiling arm64…"
 xcrun --sdk macosx swiftc -O -whole-module-optimization \
@@ -86,11 +86,11 @@ xcrun --sdk macosx swiftc -O -whole-module-optimization \
   -F "$FRAMEWORK_SEARCH" -framework llama \
   -Xlinker -rpath -Xlinker @executable_path/../Frameworks \
   -framework Cocoa -framework WebKit -framework Network -framework Security -framework UserNotifications -framework Vision \
-  -o "$BUILD/Dawaya-arm64" "${SRC[@]}"
+  -o "$BUILD/DrugcopeiaAI-arm64" "${SRC[@]}"
 
-lipo -create "$BUILD/Dawaya-x86_64" "$BUILD/Dawaya-arm64" -output "$CONTENTS/MacOS/Dawaya"
-chmod +x "$CONTENTS/MacOS/Dawaya"
-rm -f "$BUILD/Dawaya-x86_64" "$BUILD/Dawaya-arm64"
+lipo -create "$BUILD/DrugcopeiaAI-x86_64" "$BUILD/DrugcopeiaAI-arm64" -output "$CONTENTS/MacOS/DrugcopeiaAI"
+chmod +x "$CONTENTS/MacOS/DrugcopeiaAI"
+rm -f "$BUILD/DrugcopeiaAI-x86_64" "$BUILD/DrugcopeiaAI-arm64"
 
 echo "Signing…"
 # The xcframework ships with symlinks materialized as real copies (the source
@@ -115,9 +115,9 @@ codesign --force --sign - --timestamp=none "$APP"
 codesign --verify --deep --strict "$APP"
 
 echo "Bundling disk image…"
-DMG="$ROOT/build/Dawaya-mac.dmg"
+DMG="$ROOT/build/DrugcopeiaAI-mac.dmg"
 rm -f "$DMG"
-hdiutil create -quiet -volname "Dawaya" -srcfolder "$APP" -ov -format UDZO "$DMG"
+hdiutil create -quiet -volname "Drugcopeia AI" -srcfolder "$APP" -ov -format UDZO "$DMG"
 
 echo "Built: $APP"
 echo "Built: $DMG"

@@ -752,7 +752,8 @@
     const fallback = wanted === 'en' ? 'ar' : 'en';
     const prompts = api.assets && api.assets.prompts ? api.assets.prompts : {};
     const template = prompts[wanted] ? prompts[wanted] : String(prompts[fallback] || '');
-    return fillPlaceholders(template, { CONTEXT: pack.contextText, QUESTION: pack.question, HISTORY: history || '' });
+    const audience = typeof global.DrugcopeiaAudience === 'function' ? String(global.DrugcopeiaAudience(wanted) || '') : '';
+    return (audience ? audience + '\n\n' : '') + fillPlaceholders(template, { CONTEXT: pack.contextText, QUESTION: pack.question, HISTORY: history || '' });
   }
 
   function fillPlaceholders(template, values) {

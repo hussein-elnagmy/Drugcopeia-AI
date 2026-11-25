@@ -9,7 +9,7 @@ GO="${GO:-go}"
 # busting there, and webapp/ still carries the previous revision.
 WEBAPP="${WEBAPP:-../www}"
 [ -d "$WEBAPP" ] || WEBAPP="../webapp"
-OUT="${OUT:-dist/Dawaya.exe}"
+OUT="${OUT:-dist/DrugcopeiaAI.exe}"
 
 if [ ! -d "$WEBAPP" ]; then
   echo "webapp source not found: $WEBAPP" >&2
@@ -25,7 +25,7 @@ rsync -a --delete --exclude '.DS_Store' "$WEBAPP"/ www/
 rm -f www/ios-shell.js
 
 # On-device llama.cpp runtime: llama-server.exe plus its DLLs are embedded in the
-# exe and unpacked into %LOCALAPPDATA%\Dawaya\runtime on first launch. The staged
+# exe and unpacked into %LOCALAPPDATA%\Drugcopeia AI\runtime on first launch. The staged
 # set in llama/ is llama.cpp b11985 windows-x64 CPU build - llama/README.txt carries
 # the archive URL and SHA-256 and records that each file was checked against it.
 # LLAMA_WIN_ZIP replaces it; when the zip is absent whatever is already staged is
@@ -57,12 +57,12 @@ rm -f rsrc_windows_*.syso
   --out rsrc \
   --manifest gui \
   --icon tools/dawaya.ico \
-  --product-name "Drugcopeia" \
-  --file-description "Drugcopeia - offline Egypt medicine, condition and lab test guide" \
+  --product-name "Drugcopeia AI" \
+  --file-description "Drugcopeia AI - medicine information chat assistant" \
   --product-version 1.7.8.0 \
   --file-version 1.7.8.0 \
-  --original-filename "Dawaya.exe" \
-  --copyright "Dawaya"
+  --original-filename "DrugcopeiaAI.exe" \
+  --copyright "Drugcopeia AI"
 
 echo "==> building $OUT"
 mkdir -p "$(dirname "$OUT")"

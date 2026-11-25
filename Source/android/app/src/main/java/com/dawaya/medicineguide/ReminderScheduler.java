@@ -21,7 +21,7 @@ import java.util.Calendar;
 final class ReminderScheduler {
     static final String PREFS = "dawaya_reminders";
     static final String KEY_ITEMS = "items";
-    static final String ACTION_REMINDER = "com.dawaya.medicineguide.action.REMINDER";
+    static final String ACTION_REMINDER = "app.drugcopeia.ai.action.REMINDER";
 
     // Mirrors `DawayaCore.reminders.ESCALATION_MINUTES` in the web layer.
     static final int[] ESCALATION_OFFSETS = { 0, 10, 30 };

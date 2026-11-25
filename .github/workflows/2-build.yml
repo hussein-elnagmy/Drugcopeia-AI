@@ -96,7 +96,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Dawaya-macos-dmg
-          path: Source/build/Dawaya-mac.dmg
+          path: Source/build/DrugcopeiaAI-mac.dmg
 
 
   web-assistant-check:
@@ -137,11 +137,11 @@ jobs:
         run: |
           APP_PATH=$(find build/DerivedData/Build/Products -name '*.app' -maxdepth 3 | head -1)
           echo "Built app: $APP_PATH" >> $GITHUB_STEP_SUMMARY
-          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" Dawaya-ios-unsigned.zip
+          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" DrugcopeiaAI-ios-unsigned.zip
       - uses: actions/upload-artifact@v4
         with:
           name: Dawaya-ios-simulator-unsigned
-          path: Source/ios/App/Dawaya-ios-unsigned.zip
+          path: Source/ios/App/DrugcopeiaAI-ios-unsigned.zip
 
   release:
     needs: [android-apk, windows-exe, macos-dmg, ios-unsigned, web-assistant-check]
@@ -156,17 +156,17 @@ jobs:
       - name: Zip source tree for release
         run: |
           R=$(tr -d '[:space:]' < Source/REVISION)
-          zip -qr "Drugcopeia-r${R}.zip" Source
+          zip -qr "DrugcopeiaAI-r${R}.zip" Source
       - name: Stage per-OS release files
         run: |
           set -euo pipefail
           R=$(tr -d '[:space:]' < Source/REVISION)
           mkdir -p release
-          find dist/Dawaya-android-apk -name '*.apk' -exec cp {} "release/Drugcopeia-r${R}-android.apk" \;
-          find dist/Dawaya-windows-exe -name '*.exe' -exec cp {} "release/Drugcopeia-r${R}-windows.exe" \;
-          find dist/Dawaya-macos-dmg -name '*.dmg' -exec cp {} "release/Drugcopeia-r${R}-macos.dmg" \;
-          find dist/Dawaya-ios-simulator-unsigned -name '*.zip' -exec cp {} "release/Drugcopeia-r${R}-ios-unsigned.zip" \;
-          cp "Drugcopeia-r${R}.zip" "release/Drugcopeia-r${R}-source-web.zip"
+          find dist/Dawaya-android-apk -name '*.apk' -exec cp {} "release/DrugcopeiaAI-r${R}-android.apk" \;
+          find dist/Dawaya-windows-exe -name '*.exe' -exec cp {} "release/DrugcopeiaAI-r${R}-windows.exe" \;
+          find dist/Dawaya-macos-dmg -name '*.dmg' -exec cp {} "release/DrugcopeiaAI-r${R}-macos.dmg" \;
+          find dist/Dawaya-ios-simulator-unsigned -name '*.zip' -exec cp {} "release/DrugcopeiaAI-r${R}-ios-unsigned.zip" \;
+          cp "DrugcopeiaAI-r${R}.zip" "release/DrugcopeiaAI-r${R}-source-web.zip"
           ls -la release
       - name: Create GitHub release
         env:
@@ -174,5 +174,5 @@ jobs:
         run: |
           R=$(tr -d '[:space:]' < Source/REVISION)
           gh release view "r${R}" >/dev/null 2>&1 || gh release create "r${R}" release/* \
-            --title "Drugcopeia r${R}" \
+            --title "Drugcopeia AI r${R}" \
             --notes "Full app, all platforms, revision r${R}. android.apk for Android, windows.exe for Windows, macos.dmg for macOS, ios-unsigned.zip is the unsigned iOS build (sign and install locally with Xcode), source-web.zip is the full source including the web/PWA version."

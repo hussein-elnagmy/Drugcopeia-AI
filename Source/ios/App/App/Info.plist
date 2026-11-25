@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Drugcopeia</string>
+	<string>Drugcopeia AI</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -20,7 +20,7 @@
 		<string>ar</string>
 	</array>
 	<key>CFBundleName</key>
-	<string>Drugcopeia</string>
+	<string>Drugcopeia AI</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -41,11 +41,11 @@
 		<false/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Dawaya opens the camera only when you tap Scan code, or when you attach a photo to a question in the assistant. What you capture is decoded on this device - the box code, or the printed label text - and is never stored or sent.</string>
+	<string>Drugcopeia AI opens the camera only when you tap Scan code, or when you attach a photo to a question in the assistant. What you capture is decoded on this device - the box code, or the printed label text - and is never stored or sent.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Dawaya uses the microphone only while voice search is listening, to turn your spoken medicine name into search text. Dawaya does not store or transmit the audio.</string>
+	<string>Drugcopeia AI uses the microphone only while voice search is listening, to turn your spoken medicine name into search text. Drugcopeia AI does not store or transmit the audio.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Dawaya turns your spoken medicine name into text for the search field. Recognition is performed by the system speech service.</string>
+	<string>Drugcopeia AI turns your spoken medicine name into text for the search field. Recognition is performed by the system speech service.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

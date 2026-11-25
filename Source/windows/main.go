@@ -35,9 +35,9 @@ var content embed.FS
 var llamaRuntime embed.FS
 
 const (
-	appName       = "Drugcopeia"
+	appName       = "Drugcopeia AI"
 	appVersion    = "1.7.8"
-	preferredPort = 47123
+	preferredPort = 47124
 	llamaVersion  = "b11985"
 )
 

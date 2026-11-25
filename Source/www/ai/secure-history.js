@@ -544,6 +544,26 @@
       });
   }
 
+  /* Read-only index for the saved-chats screen: no side effects, the open conversation stays open. */
+  async function sessionIndex() {
+    await ensureLoaded();
+    if (!historyEnabled()) return [];
+    return sessions
+      .filter(function (session) { return session.turns.length > 0; })
+      .slice()
+      .sort(function (left, right) { return right.updatedAt - left.updatedAt; })
+      .map(function (session) {
+        return {
+          id: session.id,
+          title: session.title || titleOf(firstUser(session.turns)),
+          updatedAt: session.updatedAt,
+          messages: session.turns.length,
+          user: session.turns.filter(function (t) { return t.role === 'user'; }).map(function (t) { return t.text; }).join(' \n '),
+          text: session.turns.map(function (t) { return t.text; }).join(' \n ')
+        };
+      });
+  }
+
   async function loadSession(id) {
     await ensureLoaded();
     var session = find(String(id));
@@ -676,6 +696,7 @@
     record: record,
     load: load,
     listSessions: listSessions,
+    sessionIndex: sessionIndex,
     loadSession: loadSession,
     deleteSession: deleteSession,
     beginNewSession: beginNewSession,

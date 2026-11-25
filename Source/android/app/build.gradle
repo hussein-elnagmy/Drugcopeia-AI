@@ -10,7 +10,7 @@ android {
     namespace = "com.dawaya.medicineguide"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.dawaya.medicineguide"
+        applicationId "app.drugcopeia.ai"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 48
