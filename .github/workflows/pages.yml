@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.d.outputs.page_url }}
+      url: ${{ steps.d.outputs.page_url || steps.d2.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - name: Prepare web app
@@ -34,5 +34,12 @@ jobs:
         run: sleep 45
       - id: d
         uses: actions/deploy-pages@v4
+        continue-on-error: true
+      - name: Retry deploy once after a transient Pages error
+        if: steps.d.outcome == 'failure'
+        run: sleep 90
+      - id: d2
+        if: steps.d.outcome == 'failure'
+        uses: actions/deploy-pages@v4
       - name: Every service worker shell URL must return 200 on Pages
-        run: node Source/scripts/check-shell-urls.mjs "${{ steps.d.outputs.page_url }}"
+        run: node Source/scripts/check-shell-urls.mjs "${{ steps.d.outputs.page_url || steps.d2.outputs.page_url }}"
