@@ -1,0 +1,29 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.13.0'
+        // The com.google.gms:google-services classpath was removed: Dawaya ships no
+        // Firebase plugin at all, so nothing can apply it and no crash-analytics or
+        // remote-config channel can be added to the build by accident. See
+        // privacy.config.json -> dependencies.bannedAndroidGradle.
+    }
+}
+
+apply from: "variables.gradle"
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

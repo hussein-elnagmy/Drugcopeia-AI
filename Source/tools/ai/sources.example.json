@@ -1,0 +1,41 @@
+{
+  "_comment": "Copy these shapes into tools/ai/sources.json. Every url host must already be in the allowedDomains list of webapp/assets/ai/policy-config.json, and the local copy under file: must be the text you saved from that exact url. date is the publication or last-updated date shown on the page, not the day you saved it.",
+  "documents": [
+    {
+      "id": "eda-recalls-alerts",
+      "title": "Egyptian Drug Authority — Recalls and Alerts Notice Letters",
+      "url": "https://edaegypt.gov.eg/en/awareness/recalls-alerts-and-awareness-letters/recalls-and-alerts-notice-letters/",
+      "file": "sources/eda-recalls-alerts.html",
+      "nameEn": "Egyptian Drug Authority",
+      "nameAr": "هيئة الدواء المصرية",
+      "date": "2026-10-01",
+      "language": "en",
+      "license": "Egyptian government publication; link back required",
+      "aliases": ["سحبات الأدوية", "تحذيرات هيئة الدواء", "EDA recall", "alert notice letter"]
+    },
+    {
+      "id": "who-model-list",
+      "title": "WHO Model List of Essential Medicines",
+      "url": "https://list.essentialmeds.org/",
+      "file": "sources/who-model-list.html",
+      "nameEn": "World Health Organization — Essential Medicines List",
+      "nameAr": "منظمة الصحة العالمية — قائمة الأدوية الأساسية",
+      "date": "2025-03-01",
+      "language": "en",
+      "license": "WHO; some rights reserved",
+      "aliases": ["الأدوية الأساسية", "EML", "essential medicines"]
+    },
+    {
+      "id": "dailymed-paracetamol",
+      "title": "DailyMed label: paracetamol / acetaminophen",
+      "url": "https://dailymed.nlm.nih.gov/dailymed/search.cfm?query=acetaminophen",
+      "file": "sources/dailymed-paracetamol.txt",
+      "nameEn": "DailyMed (U.S. National Library of Medicine)",
+      "nameAr": "دايلي ميد — المكتبة الوطنية للطب",
+      "date": "2026-04-12",
+      "language": "en",
+      "license": "U.S. federal government work",
+      "aliases": ["بنادول", "أسيتامينوفين", "خافض الحرارة", "acetaminophen", "paracetamol"]
+    }
+  ]
+}

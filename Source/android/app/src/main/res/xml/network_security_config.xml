@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <!--
+        GENERATED FILE - do not edit. Source: Source/privacy.config.json. Run scripts/gen-privacy-config.py.
+        Cleartext is disabled everywhere. The domain entries below mirror
+        network.allowedHosts exactly: a host that is not listed cannot be reached
+        by this process at all. DawayaPrivacyWebViewClient enforces the same list
+        per request; this file is the second, socket-level layer.
+    -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="false">www.who.int</domain>
+    </domain-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="false">api.fda.gov</domain>
+    </domain-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="false">eutils.ncbi.nlm.nih.gov</domain>
+    </domain-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="false">commons.wikimedia.org</domain>
+    </domain-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="false">thumb.wikimedia.org</domain>
+    </domain-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="false">upload.wikimedia.org</domain>
+    </domain-config>
+    <!--
+        Loopback entries exist for the desktop shells only. Android stays
+        cleartext-denied for localhost and 127.0.0.1.
+    -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="false">127.0.0.1</domain>
+        <domain includeSubdomains="false">localhost</domain>
+    </domain-config>
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </debug-overrides>
+</network-security-config>

@@ -1,0 +1,26 @@
+{
+  "name": "drugcopeia",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Drugcopeia medicine-guide source, web revision 175 on the build 48 line.",
+  "license": "AGPL-3.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "sync:web": "node scripts/sync-all.mjs",
+    "sync:ios": "npm run sync:web && cap sync ios",
+    "open:ios": "cap open ios",
+    "verify": "node scripts/verify-project.mjs",
+    "sync:all": "node scripts/sync-all.mjs",
+    "check:revision": "node scripts/sync-all.mjs --check"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3",
+    "@capacitor/ios": "8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3"
+  }
+}

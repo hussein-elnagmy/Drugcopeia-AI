@@ -1,0 +1,130 @@
+{
+  "generator": "sqlite-fts5",
+  "fieldWeights": [
+    1.0,
+    6.0,
+    5.0
+  ],
+  "results": [
+    {
+      "query": "paracetamol liver damage",
+      "ids": [
+        "cond-6465-2",
+        "cond-6465-3",
+        "cond-1686-1"
+      ]
+    },
+    {
+      "query": "high blood pressure symptoms",
+      "ids": [
+        "cond-4939-1",
+        "cond-6450-3",
+        "cond-1508-5"
+      ]
+    },
+    {
+      "query": "A1C normal level prediabetes",
+      "ids": [
+        "cond-6308-1",
+        "cond-5784-5",
+        "cond-5784-1"
+      ]
+    },
+    {
+      "query": "aspirin stomach bleeding",
+      "ids": [
+        "cond-357-1",
+        "cond-6415-5",
+        "cond-4059-3"
+      ]
+    },
+    {
+      "query": "ibuprofen kidney",
+      "ids": [
+        "cond-4059-3",
+        "cond-511-2",
+        "cond-6382-2"
+      ]
+    },
+    {
+      "query": "amoxicillin rash allergy",
+      "ids": [
+        "cond-1439-1",
+        "cond-1256-3",
+        "cond-1256-5"
+      ]
+    },
+    {
+      "query": "cholesterol statin muscle pain",
+      "ids": [
+        "cond-4909-6",
+        "cond-26-8",
+        "cond-4909-5"
+      ]
+    },
+    {
+      "query": "asthma reliever inhaler",
+      "ids": [
+        "cond-1507-8",
+        "cond-2-7",
+        "cond-196-5"
+      ]
+    },
+    {
+      "query": "levothyroxine thyroid dose",
+      "ids": [
+        "cond-6175-7",
+        "cond-438-2",
+        "cond-438-5"
+      ]
+    },
+    {
+      "query": "warfarin vitamin K foods",
+      "ids": [
+        "cond-5383-2",
+        "cond-6448-8",
+        "cond-5385-1"
+      ]
+    },
+    {
+      "query": "diabetes type 2 blood sugar",
+      "ids": [
+        "cond-6121-8",
+        "cond-6661-1",
+        "cond-1264-3"
+      ]
+    },
+    {
+      "query": "anemia iron deficiency fatigue",
+      "ids": [
+        "cond-5542-4",
+        "cond-139-2",
+        "cond-139-1"
+      ]
+    },
+    {
+      "query": "asthma symptoms",
+      "ids": [
+        "cond-1507-5",
+        "cond-1507-7",
+        "cond-1507-8"
+      ]
+    },
+    {
+      "query": "how is asthma diagnosed",
+      "ids": [
+        "cond-1507-6",
+        "cond-2-6",
+        "cond-1507-2"
+      ]
+    },
+    {
+      "query": "what increases the risk of stroke",
+      "ids": [
+        "cond-8-3",
+        "cond-385-2",
+        "cond-6469-5"
+      ]
+    }
+  ]
+}

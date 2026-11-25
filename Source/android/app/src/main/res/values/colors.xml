@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#0B66C3</color>
+    <color name="colorPrimaryDark">#084B8F</color>
+    <color name="colorAccent">#4C9AFF</color>
+    <!-- Readable on the light toolbar a Custom Tab draws. -->
+    <color name="custom_tab_action_icon">#FF1B1B1F</color>
+</resources>

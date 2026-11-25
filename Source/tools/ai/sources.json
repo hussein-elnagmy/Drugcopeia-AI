@@ -1,0 +1,4 @@
+{
+  "_comment": "Documents to ingest into the offline knowledge index. build_knowledge_index.py rejects any entry whose url host is not in webapp/assets/ai/policy-config.json -> sources.allowedDomains, so an off-list source cannot be added here. Copy the official page or PDF text into tools/ai/sources/ and point file at it; see sources/README.md.",
+  "documents": []
+}

@@ -1,0 +1,184 @@
+index built in 2488 ms - medicines 25070, passages 3468
+  ok   tashkeel, hamza and taa marbuta are folded
+  ok   arabic-indic digits and arabic punctuation become ascii
+  ok   compact removes every space
+  ok   tokenize stems the definite article and Arabic plurals
+  ok   an Arabic trade name scores against its Latin spelling
+  ok   editDistance is bounded and clamps past the limit
+  ok   fuzzyScore favours a truncated brand name
+  ok   verbal numbers fold into digits so the guard can see them
+  ok   re: patterns are honoured by matchPattern
+  ok   an English brand name returns that brand first
+  ok   the Arabic spelling of the same brand returns it too
+  ok   a misspelt brand still matches through the fuzzy name pass
+  ok   an active ingredient finds the products that list it
+  ok   gibberish returns nothing above the score floor
+  ok   lookupNameToken knows a medicine name and ignores an ordinary word
+  ok   a long question is cut at the configured limit
+  ok   an English injection sentence is stripped and the real question survives
+  ok   an Arabic role-play and prompt-extraction attempt is stripped
+  ok   a question that is only an attack has nothing left to answer
+  ok   the stripped span is cut exactly, not past its end
+  ok   zero-width and bidi override characters are removed
+  ok   control characters and repeated filler do not crash the sanitizer
+  ok   an empty or whitespace-only question is rejected
+  ok   a football question is refused as off-topic
+  ok   a cooking question in Arabic is refused as off-topic
+  ok   r181: a World Cup trivia question is refused, not answered with a no-record page
+  ok   r181: a pasta recipe is refused, "best" is not a medicine name
+  ok   r181: the off-topic fix does not refuse real medicine questions
+  ok   an Arabic medicine question passes the gate
+  ok   an English symptom question passes the gate
+  ok   symptom complaints in Egyptian Arabic pass the gate
+  ok   hair loss is not mistaken for poetry
+  ok   an Arabic condition name alone passes the gate
+  ok   an English condition question with no brand name passes the gate
+  ok   the classifier is consulted only inside the ambiguous band
+  ok   a low classifier confidence asks one clarifying question
+  ok   a classifier verdict of off-topic is refused
+  ok   without a classifier an ambiguous question clarifies instead of guessing
+  ok   Arabic chest pain is detected
+  ok   Arabic stroke signs is detected
+  ok   Arabic severe bleeding is detected
+  ok   Arabic overdose is detected
+  ok   Arabic poisoning is detected
+  ok   Arabic breathing difficulty is detected
+  ok   Arabic unconsciousness is detected
+  ok   Arabic seizure is detected
+  ok   Arabic suicidal thoughts is detected
+  ok   Arabic infant fever is detected
+  ok   English chest pain is detected
+  ok   English overdose is detected
+  ok   English poisoning is detected
+  ok   English seizure is detected
+  ok   English suicidal is detected
+  ok   an ordinary headache question is not an emergency
+  ok   an educational question about a stroke is not a personal emergency
+  ok   the same stroke question about the reader is still an emergency
+  ok   a grounded answer from the retrieved fields passes
+  ok   an invented strength is caught
+  ok   an invented medicine name is caught
+  ok   a diagnosis sentence is refused
+  ok   a personalized dose instruction is refused
+  ok   an educational diagnosis sentence is allowed
+  ok   the same diagnosis addressed to the reader is still refused
+  ok   advice to stop a medicine is refused
+  ok   an English-only answer is refused by the Arabic requirement
+  ok   an empty or very short answer is refused
+  ok   a number spelled in Arabic words is still checked against the records
+  ok   an Egyptian brand resolves from its English name
+  ok   the same brand resolves from its Arabic name
+  ok   a typed strength ranks the row whose name carries it first
+  ok   a retrieved medicine carries every structured field the card shows
+  ok   a condition question returns a trusted document passage
+  ok   an Egyptian stroke synonym reaches the stroke passage, not a medicine row
+  ok   an unknown medicine name finds no data
+  ok   at most three records are handed to the model
+  ok   egyptian records come before international documents
+  ok   the context block stays inside the configured character budget
+  ok   safety flags are taken from the retrieved text only
+  ok   the fallback card repeats database values verbatim
+  ok   a grounded Egyptian medicine question produces an answer with sources
+  ok   a medicine answer carries official authority links the model never wrote
+  ok   the prompt carries the retrieved records and no unfilled placeholder
+  ok   an off-topic question is refused without asking the model to answer
+  ok   r181: end to end, off-topic phrasings never reach retrieval or the model
+  ok   a greeting is answered as conversation instead of refused
+  ok   thanks, who are you and goodbye are conversation
+  ok   a greeting that carries a symptom stays a health question
+  ok   a single-word greeting pattern never matches inside a longer word
+  ok   a greeting gets a warm reply with no disclaimer and no card
+  ok   a chat reply that carries a number or a medicine name falls back to the fixed line
+  ok   a greeting still gets a warm reply on a device with no model
+  ok   an English greeting in an Arabic interface is greeted in English
+  ok   the answer language follows the question, not only the menus
+  ok   an english question is answered from the english prompt and the guard expects english
+  ok   the prompt carries the earlier turns so a follow-up has a subject
+  ok   history is capped and empty on the first question
+  ok   an Arabic emergency gets the ambulance message and no generation
+  ok   a condition question is answered with sources and the doctor note
+  ok   the same condition asked about the reader stops at the emergency message
+  ok   a stroke question is answered from the stroke reference, with no medicine card
+  ok   a medicine nobody knows about is refused, never answered from general knowledge
+  ok   an unsourced dose is never shown, because the general route stays off
+  ok   a symptom complaint the data cannot answer gets the international sources
+  ok   an Arabic condition name resolves to its English reference page
+  ok   a pure injection payload is rejected at step one
+  ok   an answer that invents a strength is discarded for the database card
+  ok   a weak device never loads the model and answers from smart search
+  ok   a 4 GB phone is supported and runs the memory-saving profile
+  ok   a 6 GB phone still runs the full context profile
+  ok   a 3 GB phone is supported and runs the low-memory profile
+  ok   without a llama.cpp runtime the assistant still answers from the database
+  ok   stopping a generation returns the card with the stopped message
+  ok   a failed generation falls back to the card instead of an error-only reply
+  ok   the stop button forwards the cancel to the runtime
+  ok   every reply type carries the Arabic disclaimer and a source list key
+  ok   the English bundle answers the same flow in English
+  ok   no runtime at all is reported and blocks every action
+  ok   a 2 GB phone is refused the download
+  ok   the configured model is small enough for an old phone
+  ok   the first download uses the configured url, file name, size and checksum
+  ok   a cellular download is allowed only when the user accepts the size
+  ok   progress events drive the bar and pause and resume keep the same job
+  ok   cancel clears the stored record and returns to not downloaded
+  ok   a completed download verifies its checksum before use
+  ok   a checksum mismatch deletes the file and never loads it
+  ok   an already verified model is never downloaded again
+  ok   a new model version drops the stored file and starts over
+  ok   deleting the model keeps the app honest about its state
+  ok   releasing for background or memory pressure keeps the downloaded file
+  ok   manual import registers a local file and verifies it
+  ok   an imported file with a bad checksum is rejected
+  ok   a failed load reports an error instead of pretending to be ready
+  ok   loading is refused when free memory is below the configured floor
+  ok   a lean device loads with less free memory than the full profile needs
+  ok   a device with memory to spare is still held to the full floor
+  ok   generation parameters come from the config file
+  ok   the assistant page hands the model manager the whole config file
+  ok   the Google photograph path is gone from the app and every mirror
+  ok   the commons gallery runs keyless, press-only and tracking-free
+  ok   the commons viewer pinches, clamps and closes
+  ok   every allowlisted host has a privacy label in both languages
+  ok   every photo-section label has an English and an Arabic copy
+  ok   every shipped document host is on the configured allowlist
+  ok   every document records source, url, date, language and license
+  ok   a database row with no source is labelled as app data with its version
+  ok   the Arabic disclaimer is the exact required sentence
+       FTS5 page agreement 56% · paracetamol liver damage -> 2/2 | high blood pressure symptoms -> 2/3 | A1C normal level prediabetes -> 2/2
+  ok   the runtime index agrees with the SQLite FTS5 reference
+  ok   the trusted document index is bundled and covers conditions
+  ok   an Arabic section word chooses the matching passage of the page
+  ok   section vocabulary is never searchable text
+  ok   every passage carries the heading it came from
+  ok   each shell pools tokens before touching the web view
+  ok   the Apple engine keeps the prompt cached between turns
+  ok   the waiting line leaves as soon as the answer starts
+  ok   send and stop never share the composer
+  ok   a photographed barcode resolves through the bundled code table
+  ok   printed pack text picks the directory brand, strengths and all
+  ok   a weak read is reported as a weak read, never as a guessed medicine
+  ok   the photograph reader never reaches the network
+  ok   both bundles carry the same photograph strings
+  ok   the photograph module is on the offline shell cache
+  ok   every Apple shell can read a pack photograph on the device
+  ok   a question from any specialty passes the gate
+  ok   a dangerous question goes to the ambulance, not to the model
+  ok   the general route is skipped when no model is on the device
+  ok   a general answer with a dose or a diagnosis of the reader is refused
+  ok   the general prompts promise no dose and carry no reference block
+  ok   both bundles carry the same general-information strings
+  ok   a general answer says it is general and the notice only appears once
+  ok   advanced options live in the settings panel, not the chat page
+  ok   the composer clears the bottom bar, the home indicator and the keyboard
+  ok   the newest line is followed in the scroller that actually moves
+  ok   the web ChatML wrap is byte-identical to the three native shells
+  ok   llama-server parameter names map to the wllama completion options
+  ok   the streaming SHA-256 matches the published vectors
+  ok   the transport order keeps native first and offers web-wasm where it can run
+  ok   web generation streams tokens and reports a cancellation with its partial text
+  ok   the download refuses to start without the privacy gate
+  ok   the vendored runtime is pinned, shipped and wired into the page
+  ok   the privacy gate knows the model download door
+
+Dawaya AI suite: 180/180 passed

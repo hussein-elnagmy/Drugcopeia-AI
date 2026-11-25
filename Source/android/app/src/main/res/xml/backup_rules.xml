@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Legacy (Android 11 and below) backup rules, referenced by
+    android:fullBackupContent. Excludes every domain so no app data is ever written
+    to a Google backup or a local .ab file: query history, custom drugs and reminder
+    names are health data and stay on the device.
+-->
+<full-backup-content>
+    <exclude
+        domain="root"
+        path="." />
+    <exclude
+        domain="file"
+        path="." />
+    <exclude
+        domain="database"
+        path="." />
+    <exclude
+        domain="sharedpref"
+        path="." />
+    <exclude
+        domain="external"
+        path="." />
+</full-backup-content>

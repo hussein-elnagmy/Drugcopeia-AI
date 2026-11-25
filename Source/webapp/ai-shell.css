@@ -1,0 +1,102 @@
+/* Drugcopeia AI - chat-only shell. ChatGPT / Claude style: one centered column,
+   bubbles, a pill composer at the bottom, a collapsible side menu. */
+html.ai-only,html.ai-only body{height:100%;overflow:hidden;background:var(--aiBg);color:var(--aiInk);padding:0}
+html.ai-only{--aiBg:#ffffff;--aiInk:#1f2328;--aiMuted:#6b7280;--aiLine:#e5e7eb;--aiUser:#f1f3f5;--aiSide:#f7f7f8;--aiAccent:#0f766e;--aiAccentInk:#fff;--aiCol:760px}
+html.ai-only[data-theme="dark"]{--aiBg:#212121;--aiInk:#ececec;--aiMuted:#9ca3af;--aiLine:#3a3a3a;--aiUser:#2f2f2f;--aiSide:#171717;--aiAccent:#10a37f}
+html.ai-only .topbar,html.ai-only .app-sidenav,html.ai-only .bottom-nav,html.ai-only #drawerBackdrop,html.ai-only .search-top{display:none!important}
+html.ai-only .app-workspace,html.ai-only #mainContent{display:block;max-width:none;margin:0;padding:0;height:100%}
+html.ai-only #mainContent>section:not(#assistantPage):not(.ai-only-page){display:none!important}
+html.ai-only[data-ai-page="other"] #mainContent>section.ai-only-page{display:block!important;max-width:820px;margin:0 auto;padding:60px 20px 40px;height:100%;overflow:auto;background:var(--aiBg)}
+html.ai-only #assistantPage{position:fixed;inset:0;max-width:none;margin:0;padding:0;display:flex;flex-direction:column;background:var(--aiBg);font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif}
+html.ai-only #assistantPage[hidden]{display:none!important}
+html.ai-only[dir="rtl"] #assistantPage{font-family:'Geeza Pro','SF Pro Arabic','Segoe UI',Tahoma,Arial,sans-serif}
+/* header */
+html.ai-only .assistant-head{flex:none;padding:calc(8px + env(safe-area-inset-top)) 12px 6px;border:0;background:var(--aiBg)}
+html.ai-only .assistant-head-top{display:flex;align-items:center;gap:10px;max-width:calc(var(--aiCol) + 120px);margin:0 auto}
+html.ai-only .assistant-brand{display:none}
+html.ai-only .assistant-head-copy{flex:1;min-width:0;text-align:center}
+html.ai-only .assistant-head-copy .section-kicker,html.ai-only #aiPageSubtitle{display:none}
+html.ai-only #aiPageTitle{margin:0;font-size:1.05rem;font-weight:650;letter-spacing:0;color:var(--aiInk)}
+html.ai-only .ai-menu-button{order:-1;width:40px;height:40px;border-radius:10px;border:0;background:transparent;color:var(--aiInk);display:grid;place-items:center;cursor:pointer}
+html.ai-only .ai-menu-button:hover{background:var(--aiUser)}
+html.ai-only .assistant-head-top::after{content:"";width:40px;flex:none}
+html.ai-only .assistant-status{display:flex;justify-content:center;align-items:center;gap:6px;margin:2px 0 0;font-size:.72rem;color:var(--aiMuted)}
+/* model card, compact and inside the page flow */
+html.ai-only .ai-panel{flex:none;width:calc(100% - 24px);max-width:var(--aiCol);margin:6px auto;padding:14px 16px;border:1px solid var(--aiLine);border-radius:16px;background:var(--aiSide);max-height:38vh;overflow:auto}
+html.ai-only .ai-panel[hidden]{display:none}
+html.ai-only .ai-panel-grid{display:none}
+html.ai-only .ai-panel h3{font-size:.95rem;margin:0 0 4px}
+html.ai-only .ai-panel p{font-size:.82rem;color:var(--aiMuted);margin:0 0 6px}
+html.ai-only .ai-button{border-radius:999px;border:1px solid var(--aiLine);background:var(--aiBg);color:var(--aiInk);padding:8px 16px;font:600 .82rem inherit;cursor:pointer}
+html.ai-only .ai-button-primary{background:var(--aiAccent);border-color:var(--aiAccent);color:var(--aiAccentInk)}
+html.ai-only .ai-smart-banner{flex:none;max-width:var(--aiCol);width:calc(100% - 24px);margin:4px auto;font-size:.8rem;color:var(--aiMuted)}
+/* conversation */
+html.ai-only .ai-log{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:12px 14px 20px;display:block;-webkit-overflow-scrolling:touch}
+html.ai-only .ai-log>*{max-width:var(--aiCol);margin-left:auto;margin-right:auto}
+html.ai-only .ai-msg{display:flex;gap:12px;margin:18px auto;align-items:flex-start}
+html.ai-only .ai-msg-user{justify-content:flex-end}
+html.ai-only .ai-msg-user .ai-bubble{background:var(--aiUser);border-radius:20px;padding:10px 16px;max-width:82%;border:0;color:var(--aiInk);line-height:1.6;font-size:.98rem}
+html.ai-only .ai-msg-bot .ai-bubble{background:transparent;border:0;padding:0;flex:1;min-width:0;color:var(--aiInk);line-height:1.75;font-size:.98rem;box-shadow:none}
+html.ai-only .ai-avatar{flex:none;width:30px;height:30px;border-radius:50%;background:var(--aiAccent);color:#fff;display:grid;place-items:center;font-size:.8rem;font-weight:700}
+html.ai-only .ai-avatar svg{width:18px;height:18px}
+html.ai-only .ai-card,html.ai-only .ai-sources,html.ai-only .ai-pillars,html.ai-only .ai-call,html.ai-only .ai-general-note{border:1px solid var(--aiLine);border-radius:14px;background:var(--aiSide);color:var(--aiInk)}
+html.ai-only .ai-disclaimer{font-size:.74rem;color:var(--aiMuted)}
+html.ai-only .ai-source-link{color:var(--aiAccent)}
+/* composer */
+html.ai-only .ai-composer{flex:none;position:relative;width:calc(100% - 24px);max-width:var(--aiCol);margin:0 auto calc(14px + env(safe-area-inset-bottom));padding:8px 10px 6px;border:1px solid var(--aiLine);border-radius:26px;background:var(--aiBg);box-shadow:0 2px 14px rgba(0,0,0,.08);bottom:auto;z-index:2}
+html.ai-only[data-keyboard] .ai-composer{bottom:auto;margin-bottom:10px}
+html.ai-only #aiInput{width:100%;border:0;outline:0;resize:none;background:transparent;color:var(--aiInk);font:1rem/1.5 inherit;padding:6px 8px;max-height:30vh}
+html.ai-only .ai-composer-bar{display:flex;align-items:center;gap:8px}
+html.ai-only .ai-hint{flex:1;font-size:.7rem;color:var(--aiMuted)}
+html.ai-only .ai-send,html.ai-only .ai-stop{width:36px;height:36px;border-radius:50%;border:0;background:var(--aiInk);color:var(--aiBg);display:grid;place-items:center;font-size:0;cursor:pointer;flex:none}
+html.ai-only .ai-send::before{content:"\2191";font-size:1.15rem;font-weight:700}
+html.ai-only .ai-stop::before{content:"";width:12px;height:12px;background:var(--aiBg);border-radius:2px}
+html.ai-only .ai-send[disabled]{opacity:.35}
+html.ai-only .ai-attach{width:36px;height:36px;border-radius:50%;border:0;background:transparent;color:var(--aiMuted);font-size:0;cursor:pointer;display:grid;place-items:center}
+html.ai-only .ai-attach::before{content:"+";font-size:1.5rem;line-height:1;color:var(--aiInk)}
+/* welcome + suggestions */
+.ai-welcome{text-align:center;padding:9vh 8px 10px}
+.ai-welcome-mark{width:54px;height:54px;margin:0 auto 14px;border-radius:50%;background:var(--aiAccent);color:#fff;display:grid;place-items:center;font-size:1.5rem;font-weight:700}
+.ai-welcome h1{margin:0 0 6px;font-size:1.6rem;font-weight:700}
+.ai-welcome p{margin:0 auto 18px;max-width:34em;color:var(--aiMuted);font-size:.95rem;line-height:1.6}
+.ai-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:var(--aiCol);margin:0 auto}
+.ai-chip{border:1px solid var(--aiLine);background:var(--aiBg);color:var(--aiInk);border-radius:16px;padding:10px 14px;font:.86rem/1.4 inherit;cursor:pointer;text-align:start}
+.ai-chip:hover{background:var(--aiUser)}
+/* side menu */
+html.ai-only .ai-menu-backdrop{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.4)}
+html.ai-only .ai-menu-backdrop[hidden]{display:none}
+html.ai-only .ai-menu{position:absolute;top:0;bottom:0;inset-inline-start:0;width:min(300px,86vw);background:var(--aiSide);color:var(--aiInk);box-shadow:none;border:0;border-radius:0;display:flex;flex-direction:column;overflow:hidden;transform:none}
+html.ai-only .ai-menu[hidden]{display:none}
+html.ai-only .ai-menu-head{padding:calc(12px + env(safe-area-inset-top)) 14px 8px;display:flex;justify-content:space-between;align-items:center}
+html.ai-only .ai-menu-body{flex:1;overflow-y:auto;padding:0 8px 16px}
+html.ai-only .ai-menu-new,html.ai-only .ai-nav-item{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:0;border-radius:10px;background:transparent;color:var(--aiInk);font:.9rem inherit;cursor:pointer;text-align:start}
+html.ai-only .ai-menu-new:hover,html.ai-only .ai-nav-item:hover{background:var(--aiUser)}
+html.ai-only .ai-nav-group{margin:12px 0 4px;padding:0 12px;font-size:.7rem;color:var(--aiMuted);text-transform:uppercase;letter-spacing:.04em}
+html.ai-only .ai-menu-kicker{padding:0 12px;font-size:.7rem;color:var(--aiMuted)}
+html.ai-only .ai-menu-session{border-radius:10px}
+/* pages opened from the menu (About, Privacy) */
+.ai-back-chat{display:none}
+html.ai-only[data-ai-page="other"] .ai-back-chat{display:flex;position:fixed;top:calc(10px + env(safe-area-inset-top));inset-inline-start:12px;z-index:60;align-items:center;gap:6px;border:1px solid var(--aiLine);background:var(--aiBg);color:var(--aiInk);border-radius:999px;padding:8px 14px;font:600 .85rem inherit;cursor:pointer}
+@media(min-width:1024px){html.ai-only .ai-log>*{max-width:var(--aiCol)}}
+/* fixes after first render */
+html.ai-only .assistant-head-top{display:grid;grid-template-columns:40px 1fr 40px;max-width:none}
+html.ai-only .assistant-head-top::after{display:none}
+html.ai-only .ai-menu-button{order:0}
+html.ai-only .assistant-status{position:static!important;margin:0 auto 4px;width:max-content;max-width:90%;border:0;background:transparent;box-shadow:none;padding:0}
+html.ai-only .ai-welcome h1,html.ai-only .ai-welcome p{color:inherit}
+html.ai-only .ai-welcome h1{color:var(--aiInk)}
+html.ai-only .ai-welcome p{color:var(--aiMuted)}
+html.ai-only .ai-smart-banner{border:0;background:var(--aiSide);border-radius:12px;padding:10px 14px}
+html.ai-only .ai-smart-banner strong{color:var(--aiInk)}
+html.ai-only .ai-smart-banner .ai-inline-note{color:var(--aiMuted)}
+html.ai-only .ai-menu-body{display:flex;flex-direction:column;gap:0}
+html.ai-only #aiMenuNewChat{order:-2;border:1px solid var(--aiLine);margin:4px 0 6px;background:var(--aiBg)}
+html.ai-only #aiNavExtra{order:-1}
+html.ai-only .ai-menu .drawer-head,html.ai-only .ai-menu-head{border-bottom:0;background:var(--aiSide);color:var(--aiInk)}
+html.ai-only .ai-menu .ai-nav-item,html.ai-only .ai-menu .drawer-link{min-height:0;height:auto;padding:9px 12px;font-size:.9rem;font-weight:500;color:var(--aiInk)}
+html.ai-only .ai-menu-kicker{order:0;margin:14px 0 4px}
+html.ai-only .ai-menu *{border-color:var(--aiLine)}
+html.ai-only .ai-menu-backdrop{backdrop-filter:none}
+html.ai-only .assistant-head-copy{grid-column:2;grid-row:1}
+html.ai-only .ai-menu-button{grid-column:1;grid-row:1}
+html.ai-only #aiPageTitle{white-space:nowrap}

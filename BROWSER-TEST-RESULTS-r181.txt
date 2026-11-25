@@ -1,0 +1,24 @@
+Drugcopeia r181 real-browser runs, 2026-11-24
+Google Chrome 157 headless, fresh profile per run, real www build served locally, REAL model
+(Qwen2.5-0.5B-Instruct Q4_K_M through wllama 4.0.0, downloaded from huggingface.co, SHA-256 verified).
+Device: 2 GB RAM, 1 core, single-thread wasm (no COOP/COEP). navigator.deviceMemory spoofed to 8.
+
+r180 findings that led to r181
+- "What is the best pasta recipe for dinner?" returned cosmetic product cards; "Who won the football
+  World Cup in 2018?" passed the topic gate. Both refused in r181 (English and Egyptian Arabic).
+- Model drafts were captured: "side effects of Panadol" -> invented "abdominal pain, nausea,
+  dizziness, dry mouth" (not in the record); Arabic Concor -> "الإجابة بالعربي هي: 99". The guard
+  rejected both correctly. The guard was not changed.
+
+r181 results
+- Model download 37-86 s, integrity check, "Assistant is ready" (English UI and Arabic UI).
+- Sourced question (Panadol, EN; Concor, AR UI): record card, Sources, official verification links,
+  doctor/pharmacist reminder. Arabic UI shows the reminder in Arabic.
+- Off-topic refusals: pasta (EN), World Cup (EN), World Cup (AR), béchamel pasta (AR): fixed refusal,
+  no product cards, no model call, no web links.
+- 0 of 61-109 page requests carried question text. No POST requests.
+- Unsupported: 2 GB device -> "cannot run the model" + smart-search answer; no OPFS and no
+  WebAssembly -> "Smart search (no model)" + answer. No page errors.
+- Offline reload (verified on r180; r181 changed no caching code): service worker serves the page, model
+  loads from OPFS, answer returns.
+Scripts: Source/tests/browser/.

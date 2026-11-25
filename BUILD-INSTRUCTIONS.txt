@@ -1,0 +1,51 @@
+Dawaya / Drugcopeia r181 - build instructions
+==============================================
+
+What r181 is
+------------
+r181 = r180 + the off-topic gate fix (see Source/RELEASE-NOTES-r181.md).
+r180 = r179 (grounded assistant, official sources, no guessing, 168/168
+tests, privacy gate 0 violations, on-device model on Android, Windows, macOS
+and iOS) plus the web build running the same free on-device model:
+Qwen2.5-0.5B-Instruct via the vendored wllama 4.0.0 WebAssembly runtime,
+medical-only, with sources and the doctor/pharmacist reminder appended by
+code. All 5 platforms now ship the AI assistant. No API keys, no CDN, no
+accounts. 180/180 assistant tests, privacy gate 0 violations. See
+Source/RELEASE-NOTES-r181.md and Source/webapp/ai/README.md.
+
+The fastest way to build: GitHub Actions
+-----------------------------------------
+Everything is already wired in the private repo:
+  https://github.com/hussein-elnagmy/Drugcopeia
+Open the Actions tab, pick the newest "build-native" run, and download the
+artifacts when it finishes: Dawaya-android-apk, Dawaya-windows-exe,
+Dawaya-macos-dmg, Dawaya-ios-simulator-unsigned.
+
+Rebuild the source archive from the parts (identical in the Drive folder and
+in the GitHub repo):
+  cat Drugcopeia-r181.zip.part* > Drugcopeia-r181-source.zip
+  sha256sum Drugcopeia-r181-source.zip
+  # must equal the hash in SHA256SUMS-r181.txt, kept next to the parts both
+  # in this Drive folder and in the GitHub repository
+  unzip Drugcopeia-r181-source.zip   # gives Source/, PRIVACY.md and docs
+
+Local builds from Source/
+--------------------------
+Web app: open Source/www/index.html (already synced at r181) or serve it with
+  any static server. Tests: cd Source && node tests/ai/run-tests.js (180/180).
+Windows: cd Source/windows && ./build-windows.sh (needs Go 1.23; put the
+  official llama.cpp b11985 win-cpu-x64 zip at /tmp/llama-runtime/win.zip -
+  URL and sha256 are in Source/windows/llama/README.txt - for the full
+  on-device assistant; without it the exe falls back to grounded smart search).
+macOS: cd Source/macos && ./build-macos.sh (Xcode; ad-hoc signs; makes
+  Source/build/Dawaya-mac.dmg).
+Android: cd Source/android && npm ci --prefix .. && rm -f local.properties &&
+  ./gradlew assembleDebug (JDK 21). For the on-device assistant, build
+  libllamaserver.so first with the Android NDK - exact verified commands are
+  in Source/android/llama/README.txt (CI runs them automatically). Without
+  it the APK's assistant answers via grounded smart search.
+iOS: unsigned device build:
+  cd Source/ios/App && xcodebuild -project App.xcodeproj -scheme App \
+    -configuration Debug -destination 'generic/platform=iOS' \
+    CODE_SIGNING_ALLOWED=NO build
+  A device-installable IPA needs an Apple signing certificate.

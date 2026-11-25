@@ -1,0 +1,11 @@
+Third-party assets used by Dawaya
+=================================
+
+EG Drugs dataset
+- File: ../egyptian-drugs.json
+- Project: https://github.com/mahmoudfalous/eg-drugs
+- License: MIT (see LICENSE-eg-drugs.txt)
+- Copyright (c) 2026 Mahmoud Mohamed
+- The bundled file keeps commercial name (English/Arabic), active ingredient,
+  concentration, company, drug class, pack size and listed price. It is read
+  from app-private storage; nothing is sent anywhere.

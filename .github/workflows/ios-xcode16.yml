@@ -1,0 +1,35 @@
+name: ios-xcode16-check
+on:
+  workflow_dispatch:
+
+jobs:
+  ios-unsigned-xcode162:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode 16.2
+        run: |
+          sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
+          xcodebuild -version
+      - name: Download iOS platform support
+        run: xcodebuild -downloadPlatform iOS
+      - name: Resolve Swift packages
+        working-directory: Source/ios/App
+        run: xcodebuild -project App.xcodeproj -scheme App -resolvePackageDependencies
+      - name: Build iOS app (unsigned, device, Xcode 16.2)
+        working-directory: Source/ios/App
+        run: |
+          xcodebuild -project App.xcodeproj -scheme App -configuration Debug \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            -derivedDataPath build/DerivedData build
+      - name: Verify built app
+        working-directory: Source/ios/App
+        run: |
+          APP_PATH=$(find build/DerivedData/Build/Products -name '*.app' -maxdepth 3 | head -1)
+          echo "Built app: $APP_PATH" >> $GITHUB_STEP_SUMMARY
+          test -d "$APP_PATH"
+          ls "$APP_PATH"
+          file "$APP_PATH/App" || true
+          test -d "$APP_PATH/Frameworks/llama.framework" && echo "llama.framework embedded OK" >> $GITHUB_STEP_SUMMARY
+

@@ -1,0 +1,433 @@
+{
+  "version": 2,
+  "generatedNote": "Single source of truth for Dawaya privacy enforcement. Read by scripts/privacy-check.py (build gate) and scripts/gen-privacy-config.py, which emits webapp/generated/privacy-config.js and android/app/src/main/res/xml/network_security_config.xml. Changing anything here is a privacy decision and must be reviewed.",
+  "network": {
+    "defaultOffline": false,
+    "offlineKey": "dawaya-offline-mode",
+    "allowedHosts": [
+      {
+        "host": "www.who.int",
+        "scheme": "https",
+        "pathPrefixes": [
+          "/api/hubs/newsitems",
+          "/rss-feeds/",
+          "/news/item/"
+        ],
+        "purpose": "Headline update for the home news list. Read-only GET, run by the app itself: once when the home page is opened and afterwards at most once every six hours while the app is in the foreground. Offline mode refuses it, as it refuses everything here. Sends no identifier, no cookie and no referrer; the app never loads a WHO page in-process except to read its public summary meta tag.",
+        "userInitiatedOnly": false,
+        "scheduled": "on opening the home page, then at most once every 6 hours while the app is open; never in offline mode",
+        "methods": [
+          "GET"
+        ]
+      },
+      {
+        "host": "api.fda.gov",
+        "scheme": "https",
+        "pathPrefixes": [
+          "/drug/enforcement.json"
+        ],
+        "purpose": "FDA drug enforcement reports for the news list. Read-only GET on the same news schedule as www.who.int - opening the home page, then at most every six hours - never in offline mode. Fixed date range, no identifiers.",
+        "userInitiatedOnly": false,
+        "scheduled": "on opening the home page, then at most once every 6 hours while the app is open; never in offline mode",
+        "methods": [
+          "GET"
+        ]
+      },
+      {
+        "host": "eutils.ncbi.nlm.nih.gov",
+        "scheme": "https",
+        "pathPrefixes": [
+          "/entrez/eutils/"
+        ],
+        "purpose": "PubMed search and abstract fetch for the news list. Read-only GET on the same news schedule as www.who.int - opening the home page, then at most every six hours - never in offline mode. Fixed query text, no identifiers.",
+        "userInitiatedOnly": false,
+        "scheduled": "on opening the home page, then at most once every 6 hours while the app is open; never in offline mode",
+        "methods": [
+          "GET"
+        ]
+      },
+      {
+        "host": "127.0.0.1",
+        "scheme": "http",
+        "purpose": "Loopback shell server used only by the Windows build to serve the bundled app. Never leaves the device.",
+        "localhost": true,
+        "methods": [
+          "GET"
+        ]
+      },
+      {
+        "host": "localhost",
+        "scheme": "http",
+        "purpose": "Loopback alias of the Windows shell server and the development server. Never leaves the device.",
+        "localhost": true,
+        "methods": [
+          "GET"
+        ]
+      },
+      {
+        "host": "commons.wikimedia.org",
+        "scheme": "https",
+        "pathPrefixes": [
+          "/w/api.php"
+        ],
+        "purpose": "The \"Photos\" section of the medicine page. Only when the reader presses Show photos; the request carries the product trade name as a search term and nothing else - no account, identifier, cookie, referrer, location, device data or patient information. No answer is stored on this device, and pressing Hide photos leaves nothing behind.",
+        "userInitiatedOnly": true,
+        "methods": [
+          "GET"
+        ]
+      },
+      {
+        "host": "thumb.wikimedia.org",
+        "scheme": "https",
+        "pathPrefixes": [
+          "/wikipedia/commons/"
+        ],
+        "purpose": "The small previews in the \"Photos\" grid, fetched only after the reader pressed Show photos. Each is one image file; no file name from the reader's device, no identifier and no header that could single anyone out is sent, and the bytes live in memory until the modal is closed.",
+        "userInitiatedOnly": true,
+        "methods": [
+          "GET"
+        ]
+      },
+      {
+        "host": "upload.wikimedia.org",
+        "scheme": "https",
+        "pathPrefixes": [
+          "/wikipedia/commons/"
+        ],
+        "purpose": "The full-size file shown in the \"Photos\" modal, fetched only when the reader taps a preview. Same rule as the previews: one image, no identifier, nothing written to storage.",
+        "userInitiatedOnly": true,
+        "methods": [
+          "GET"
+        ]
+      }
+    ],
+    "forbiddenRequestHeaders": [
+      "api-user-agent",
+      "authorization",
+      "cookie",
+      "x-device-id",
+      "x-install-id",
+      "accept-language"
+    ],
+    "forbiddenUrlParameters": [
+      "utm_source",
+      "utm_medium",
+      "utm_campaign",
+      "client_id",
+      "device_id",
+      "did",
+      "imei",
+      "android_id",
+      "adid",
+      "idfa",
+      "sid",
+      "session_id",
+      "user_id",
+      "uid",
+      "api_key"
+    ],
+    "bannedThirdPartyOrigins": [
+      "*.wikipedia.org",
+      "clinicaltables.nlm.nih.gov",
+      "www.bing.com",
+      "bing.com",
+      "www.google.com",
+      "encrypted-tbn*.googleusercontent.com",
+      "tse*.mm.bing.net"
+    ],
+    "notes": "Source links (MedlinePlus, NHS, FDA, WHO, EDA, ...) are NOT merged into this list. On a user tap they open in a system browser view over the app's page, which carries a way to hand the address to the device's default browser; the app never fetches them in-process. The home news list is the only remote content the app reads, and only on demand."
+  },
+  "modelDownload": {
+    "comment": "The on-device assistant model is the only other download. The native shells fetch it once with their own downloader; the web/PWA build fetches it through DawayaNet.modelDownload under the same rules, so these hosts are deliberately absent from network.allowedHosts and appear in the web CSP connect-src only for that one path. Requests go out only after the reader turns Offline mode off and presses Download. They carry no cookie, no referrer, no identifier and the app's own name in the UA where the platform allows setting one, nothing else. Mirrors are matched by exact host or by suffix; every other host is refused before a socket is opened.",
+    "requiresOfflineModeOff": true,
+    "userInitiatedOnly": true,
+    "hosts": [
+      {
+        "host": "huggingface.co",
+        "scheme": "https",
+        "purpose": "Serves the pinned model file URL and redirects it to the Hugging Face CDN."
+      },
+      {
+        "suffix": ".hf.co",
+        "scheme": "https",
+        "purpose": "Hugging Face CDN endpoints (cdn-lfs, cas-bridge, regional aws/gcp) that actually deliver the bytes. Matched by DNS suffix, so a look-alike domain cannot pass."
+      },
+      {
+        "host": "github.com",
+        "scheme": "https",
+        "purpose": "Serves the model file pinned as a release asset of the app's own repository (hussein-elnagmy/Drugcopeia, tag model-v3) and redirects it to GitHub's asset CDN."
+      },
+      {
+        "suffix": ".githubusercontent.com",
+        "scheme": "https",
+        "purpose": "GitHub release asset CDN (release-assets / objects) that delivers the bytes. Matched by DNS suffix."
+      }
+    ],
+    "allowedRedirectHosts": [
+      "huggingface.co",
+      ".hf.co",
+      "github.com",
+      ".githubusercontent.com"
+    ],
+    "maxRedirects": 5,
+    "forbiddenHeaders": [
+      "cookie",
+      "authorization",
+      "referer",
+      "x-device-id",
+      "x-install-id"
+    ],
+    "userAgent": "Dawaya/1.7.7 (offline medicine guide; model download)"
+  },
+  "permissions": {
+    "android": {
+      "allowed": [
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.VIBRATE",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ],
+      "justification": {
+        "android.permission.INTERNET": "Used only for the user-initiated news update from the allowlisted hosts, and for the one-time, user-initiated model download after Offline mode is turned off.",
+        "android.permission.ACCESS_NETWORK_STATE": "Read locally to show whether the device has connectivity so the online-update setting is accurate. The value is never transmitted or stored.",
+        "android.permission.POST_NOTIFICATIONS": "Shows the user's own medicine reminder notifications.",
+        "android.permission.RECEIVE_BOOT_COMPLETED": "Re-registers the user's own reminder alarms after a device restart. No data is read or sent.",
+        "android.permission.SCHEDULE_EXACT_ALARM": "Fires a reminder at the exact time the user chose.",
+        "android.permission.VIBRATE": "Local reminder feedback.",
+        "android.permission.CAMERA": "Opens only when the reader taps Scan code, to read the barcode or QR code printed on a medicine box. A scanned frame is decoded on the device by the system barcode decoder and is never stored or uploaded.",
+        "android.permission.RECORD_AUDIO": "Opens only while the reader holds the voice search button, to turn a spoken medicine name into search text. Dawaya does not store or transmit the recording; the system speech service performs recognition.",
+        "android.permission.MODIFY_AUDIO_SETTINGS": "Used by the system speech recogniser while voice search is active, so its audio session can start and stop cleanly."
+      },
+      "forbidden": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.READ_CONTACTS",
+        "android.permission.READ_PHONE_STATE",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.AD_ID",
+        "com.google.android.c2dm.permission.RECEIVE",
+        "com.google.android.providers.gsf.permission.READ_GSERVICES"
+      ]
+    },
+    "ios": {
+      "allowedUsageDescriptions": [
+        {
+          "key": "NSCameraUsageDescription",
+          "value": "Dawaya opens the camera only when you tap Scan code, or when you attach a photo to a question in the assistant. What you capture is decoded on this device - the box code, or the printed label text - and is never stored or sent."
+        },
+        {
+          "key": "NSMicrophoneUsageDescription",
+          "value": "Dawaya uses the microphone only while voice search is listening, to turn your spoken medicine name into search text. Dawaya does not store or transmit the audio."
+        },
+        {
+          "key": "NSSpeechRecognitionUsageDescription",
+          "value": "Dawaya turns your spoken medicine name into text for the search field. Recognition is performed by the system speech service."
+        }
+      ],
+      "forbiddenKeys": [
+        "NSPhotoLibraryUsageDescription",
+        "NSPhotoLibraryAddUsageDescription",
+        "NSLocationWhenInUseUsageDescription",
+        "NSLocationAlwaysAndWhenInUseUsageDescription",
+        "NSContactsUsageDescription"
+      ],
+      "forbiddenValues": [
+        {
+          "key": "UIFileSharingEnabled",
+          "value": "YES"
+        },
+        {
+          "key": "LSSupportsOpeningDocumentsInPlace",
+          "value": "YES"
+        }
+      ],
+      "required": [
+        {
+          "key": "NSAppTransportSecurity.NSAllowsArbitraryLoads",
+          "value": "false"
+        }
+      ]
+    },
+    "macos": {
+      "allowedUsageDescriptions": [
+        {
+          "key": "NSCameraUsageDescription",
+          "value": "Dawaya opens the camera only when you tap Scan code, or when you attach a photo to a question in the assistant. What you capture is decoded on this device - the box code, or the printed label text - and is never stored or sent."
+        },
+        {
+          "key": "NSMicrophoneUsageDescription",
+          "value": "Dawaya uses the microphone only while voice search is listening, to turn your spoken medicine name into search text. Dawaya does not store or transmit the audio."
+        },
+        {
+          "key": "NSSpeechRecognitionUsageDescription",
+          "value": "Dawaya turns your spoken medicine name into text for the search field. Recognition is performed by the system speech service."
+        }
+      ],
+      "forbiddenKeys": [
+        "NSPhotoLibraryUsageDescription"
+      ]
+    },
+    "windows": {
+      "allowed": []
+    },
+    "web": {
+      "allowed": []
+    }
+  },
+  "dependencies": {
+    "bannedAndroidGradle": [
+      "com.google.firebase",
+      "com.google.android.gms:play-services-ads",
+      "com.google.android.gms:play-services-analytics",
+      "com.appsflyer",
+      "com.adjust",
+      "com.facebook.android",
+      "io.sentry",
+      "com.mixpanel",
+      "com.amplitude",
+      "com.segment",
+      "com.baidu.mobads",
+      "com.unity",
+      "com.vungle",
+      "com.ironsource",
+      "com.taplytics",
+      "com.braze",
+      "com.onesignal",
+      "com.kochava",
+      "com.scandit",
+      "com.google.zxing",
+      "com.journeyapps"
+    ],
+    "bannedNpmPackages": [
+      "firebase",
+      "@firebase/analytics",
+      "@firebase/crashlytics",
+      "@firebase/performance",
+      "@capacitor-firebase/analytics",
+      "@capacitor-community/firebase-crashlytics",
+      "sentry-browser",
+      "@sentry/browser",
+      "mixpanel-browser",
+      "amplitude-js",
+      "react-ga",
+      "posthog-js",
+      "plausible-tracker",
+      "@fullstory/browser",
+      "hotjar-browser",
+      "matomo-tracker",
+      "umami",
+      "web-vitals",
+      "qz-tray"
+    ],
+    "bannedGoPackages": [
+      "github.com/google/uuid"
+    ],
+    "bannedStrings": [
+      "FirebaseAnalytics",
+      "Crashlytics",
+      "GoogleAnalytics",
+      "AppsFlyer",
+      "FacebookSDK",
+      "Sentry.init",
+      "Mixpanel",
+      "Amplitude",
+      "AdMob",
+      "MobileAds",
+      "getAdvertisingIdInfo",
+      "SSAID",
+      "AdvertisingIdClient",
+      "getDeviceId",
+      "Build.SERIAL",
+      "NSAdvertisingTracking",
+      "ASIdentifierManager",
+      "identifierForVendor",
+      "CBPeripheralManager"
+    ]
+  },
+  "storage": {
+    "plaintextAllowedKeys": [
+      "dawaya-theme",
+      "dawaya-language",
+      "dawaya-type-scale",
+      "dawaya-offline-mode",
+      "dawaya-news-v1",
+      "dawaya-ai-model-state-v1",
+      "dawaya-ai-settings-v1"
+    ],
+    "localUserDataKeys": [
+      "dawaya-reminders-v1",
+      "dawaya-reminder-taken-v1",
+      "dawaya-custom-drugs-v1",
+      "dawaya-ai-chat-v1",
+      "dawaya-calc-history",
+      "dawaya-study-stats"
+    ],
+    "neverPersist": [
+      "any chat message or assistant answer in the clear: conversation saving is on by default, the stored copy is always a ciphertext envelope (Keychain / Android Keystore / DPAPI, or a WebCrypto AES-GCM envelope on Windows and the web), and turning saving off in Privacy erases every saved conversation",
+      "any patient identifier: name, phone number, national ID, address, email",
+      "the text of a search query"
+    ],
+    "note": "Keys in localUserDataKeys hold data the user typed or scheduled. They stay in app-private storage, are excluded from Android cloud backup and device transfer, are never read by any network code, and are erased by Privacy > Delete all local data. No key outside these lists may be written to localStorage. dawaya-ai-chat-v1 only ever holds a ciphertext envelope produced by ai/secure-history.js; the plaintext of a chat never goes to localStorage."
+  },
+  "history": {
+    "defaultEnabled": true,
+    "encryptAtRest": true,
+    "maxTurnsPerSession": 50,
+    "maxSessions": 30,
+    "maxAnswerChars": 4000,
+    "maxBytes": 400000,
+    "deleteOneAtATime": true,
+    "note": "Dawaya AI conversations are saved on this device by default, encrypted, so the reader can reopen them. The reader can turn saving off in Privacy, which erases every saved conversation, and can delete any single conversation from the same list. No conversation text is ever written in the clear, sent anywhere, or included in logs."
+  },
+  "links_only_never_fetched": {
+    "comment": "These hosts may appear as clickable source links and are opened only on a real tap, in a browser view that is not the app's own page: Safari's browser sheet on iPhone, a Chrome Custom Tab on Android, a second Edge window on Windows and a separate ephemeral browser window on macOS. Each of those views shows the address it is on and carries a way to take the page to the reader's own default browser. The app's own web view never fetches, preloads, frames or screenshots them, sends them no referrer and keeps no copy of what they returned.",
+    "hosts": [
+      "medlineplus.gov",
+      "www.nhs.uk",
+      "www.who.int",
+      "www.fda.gov",
+      "www.ema.europa.eu",
+      "edaegypt.gov.eg",
+      "www.edaegypt.gov.eg",
+      "serviceportal.edaegypt.gov.eg",
+      "www.mohp.gov.eg",
+      "dailymed.nlm.nih.gov",
+      "pubmed.ncbi.nlm.nih.gov",
+      "www.drugs.com",
+      "www.testing.com",
+      "www.healthcare.uiowa.edu",
+      "www.utoledo.edu",
+      "www.niddk.nih.gov",
+      "search.cdc.gov",
+      "github.com",
+      "www.google.com",
+      "mail.google.com",
+      "doi.org",
+      "www.ncbi.nlm.nih.gov"
+    ]
+  },
+  "logging": {
+    "releaseDebugEnabled": false,
+    "forbiddenLogTopics": [
+      "query",
+      "searchTerm",
+      "keyword",
+      "userInput",
+      "transcript",
+      "message",
+      "answer",
+      "patient",
+      "reminder.name",
+      "customDrugs",
+      "medicineName"
+    ],
+    "note": "Log statements must not interpolate a variable that carries user input. The build gate greps log call sites against this list."
+  }
+}

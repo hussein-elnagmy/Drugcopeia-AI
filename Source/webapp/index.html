@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!--
+    Defense in depth for the network gate in net.js. connect-src lists exactly the hosts in privacy.config.json (the model hosts huggingface.co and *.hf.co are reachable only through DawayaNet.modelDownload, after the reader presses Download); a request to anything else is stopped by
+    the browser before net.js is even consulted. 'unsafe-inline' is limited to
+    the two bootstrap scripts in this file and the one inline style attribute
+    the medicine list renders; 'wasm-unsafe-eval' is there for the vendored
+    wllama runtime (WebAssembly cannot run without it) and worker-src blob: for
+    its inference workers; there is no eval anywhere in the app.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; frame-src 'none'; form-action 'none'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob: data:; connect-src 'self' https://www.who.int https://api.fda.gov https://eutils.ncbi.nlm.nih.gov https://commons.wikimedia.org https://thumb.wikimedia.org https://upload.wikimedia.org https://huggingface.co https://*.githubusercontent.com https://github.com https://*.hf.co http://127.0.0.1:* http://localhost:*; worker-src 'self' blob:; manifest-src 'self'">
+  <meta name="theme-color" content="#1b5fc2">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Drugcopeia AI">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="icon" href="assets/red-crescent-rx-192.png" type="image/png">
+  <meta name="description" content="Search medicines in Egypt by brand, generic name, manufacturer, or price. Simple pharmacology and medicine information.">
+  <title>Drugcopeia AI</title>
+  <script src="ai-boot.js?v=196"></script>
+  <script>(()=>{try{const saved=localStorage.getItem('dawaya-theme');document.documentElement.dataset.theme=saved==='dark'||(saved!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light'}catch(_){document.documentElement.dataset.theme=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}try{const scale=Number(localStorage.getItem('dawaya-type-scale'));if(Number.isFinite(scale)&&scale>=.9&&scale<=1.3)document.documentElement.style.setProperty('--type-scale',String(scale))}catch(_){}try{if(localStorage.getItem('dawaya-language')==='ar'){document.documentElement.lang='ar';document.documentElement.dir='rtl'}}catch(_){}})();</script>
+  <link rel="stylesheet" href="styles.css?v=196">
+  <link rel="stylesheet" href="ai-shell.css?v=196">
+</head>
+<body data-view="home">
+  <a class="skip-link" href="#mainContent" data-i18n="skipToContent">Skip to main content</a>
+  <svg class="ui-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <symbol id="icon-home" viewBox="0 0 24 24"><path d="m3 10.5 9-7.5 9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/></symbol>
+    <symbol id="icon-pill" viewBox="0 0 24 24"><rect x="3.2" y="8.2" width="17.6" height="7.6" rx="3.8" transform="rotate(-45 12 12)"/><path d="m8.8 15.2 6.4-6.4"/></symbol>
+    <symbol id="icon-conditions" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/><path d="M3.5 12h4l1.5-3 3 6 2-3h6.5"/></symbol>
+    <symbol id="icon-lab" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6.5L4.8 18a2 2 0 0 0 1.7 3h11a2 2 0 0 0 1.7-3L14 9.5V3"/><path d="M7 15h10"/></symbol>
+    <symbol id="icon-dose" viewBox="0 0 24 24"><rect x="4" y="2.5" width="16" height="19" rx="2.5"/><path d="M8 7h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h4"/></symbol>
+    <symbol id="icon-interactions" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="M12 8v5M12 16.5h.01"/></symbol>
+    <symbol id="icon-feedback" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/><path d="M8 9h8M8 13h5"/></symbol>
+    <symbol id="icon-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+    <symbol id="icon-bell" viewBox="0 0 24 24"><path d="M18 8.5a6 6 0 0 0-12 0c0 6.5-3 6.8-3 8.5h18c0-1.7-3-2-3-8.5"/><path d="M9.8 20.5h4.4"/></symbol>
+    <symbol id="icon-pregnancy" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.3-9.2C1.4 8.4 3.4 5 6.7 5c2 0 3.4 1.1 4.2 2.6h2.2c.8-1.5 2.2-2.6 4.2-2.6 3.3 0 5.3 3.4 4 6.8C19.5 16.4 12 21 12 21Z"/><path d="M12 10.5v3.5M10.2 12.2h3.6"/></symbol>
+    <symbol id="icon-calc" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 7.5h7M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01"/></symbol>
+    <symbol id="icon-study" viewBox="0 0 24 24"><path d="M2.5 9 12 4.5 21.5 9 12 13.5 2.5 9Z"/><path d="M6.5 11.3v4.4c0 1.4 2.5 2.8 5.5 2.8s5.5-1.4 5.5-2.8v-4.4M21.5 9v5.5"/></symbol>
+
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="m4.5 12.5 5 5L19.5 7"/></symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></symbol>
+    <symbol id="icon-lock" viewBox="0 0 24 24"><rect x="4.5" y="10" width="15" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 14.5v2.5"/></symbol>
+    <symbol id="icon-dawaya-ai" viewBox="0 0 24 24" stroke="none"><g transform="translate(-3.64 3.5) scale(.0215)" fill="none" stroke="currentColor" stroke-width="44" stroke-linejoin="round" stroke-linecap="round"><mask id="ai-cap-knock" maskUnits="userSpaceOnUse" x="-200" y="-200" width="1500" height="1500"><rect x="-200" y="-200" width="1500" height="1500" fill="#fff" stroke="none"/><g transform="translate(525 525) rotate(-38) scale(0.78)" fill="#000" stroke="#000" stroke-width="82"><rect x="-286" y="-116" width="572" height="232" rx="116"/></g></mask><path fill-rule="evenodd" d="M238 190 H490 C900 190 900 834 490 834 H238 Z M366 318 H490 C720 318 720 706 490 706 H366 Z" mask="url(#ai-cap-knock)"/><g transform="translate(525 525) rotate(-38) scale(0.78)" stroke-width="56"><rect x="-286" y="-116" width="572" height="232" rx="116"/><path d="M0 -116 V116" stroke-width="51"/></g></g><path fill="currentColor" d="m18.4 2.9.95 2.35 2.35.95-2.35.95-.95 2.35-.95-2.35-2.35-.95 2.35-.95Z"/></symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.1"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1.11 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.08a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.08a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1Z"/></symbol>
+    <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></symbol>
+    <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M20.5 15.2A8.4 8.4 0 0 1 8.8 3.5 8.5 8.5 0 1 0 20.5 15.2Z"/></symbol>
+    <symbol id="icon-monitor" viewBox="0 0 24 24"><rect x="2.6" y="4.2" width="18.8" height="13" rx="2.4"/><path d="M9 21h6"/></symbol>
+    <symbol id="icon-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15.5 15.5 0 0 1 0 18 15.5 15.5 0 0 1 0-18Z"/></symbol>
+    <symbol id="icon-scan" viewBox="0 0 24 24"><path d="M4 6V4h3M17 4h3v2M20 18v2h-3M7 20H4v-2"/><path d="M7 8.5v7M10 8.5v7M13 8.5v7M16 8.5v7"/></symbol>
+    <symbol id="icon-mic" viewBox="0 0 24 24"><rect x="9" y="2.8" width="6" height="11.2" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0"/><path d="M12 18v3"/></symbol>
+    <symbol id="icon-back" viewBox="0 0 24 24"><path d="M14.8 5.4 8.2 12l6.6 6.6"/></symbol>
+  </svg>
+  <div id="appStatus" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+  <div id="privacyGuardNote" class="privacy-guard-note" role="status" aria-live="polite" hidden></div>
+  <header class="topbar">
+    <div class="topbar-leading">
+      <button id="appBack" class="app-back" type="button" hidden aria-label="Back to the previous page" data-i18n-aria="appBackAria"><svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-back"></use></svg></button>
+      <a class="brand" href="#" aria-label="Drugcopeia home" data-i18n-aria="brandAria"><img class="brand-mark" src="assets/red-crescent-rx-96.png" srcset="assets/red-crescent-rx-96.png 1x, assets/red-crescent-rx-192.png 2x" alt=""><span><strong id="brandName">Drugcopeia</strong><small id="brandSubtitle">EGYPT MEDICINE GUIDE</small></span></a>
+    </div>
+    <span class="top-note"><i></i><span id="dbStatus">Connecting to medicine database</span></span>
+    <div class="header-actions"><button id="menuToggle" class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="drawerBackdrop">☰</button></div>
+  </header>
+
+  <div class="app-workspace">
+    <nav class="app-sidenav" aria-label="Primary navigation" data-i18n-aria="primaryNavAria">
+      <p class="sidenav-kicker" data-i18n="workspaceLabel">MEDICINE SAFETY WORKSPACE</p>
+      <div class="sidenav-links">
+        <button class="sidenav-link is-active" type="button" data-app-nav="unified-search" aria-current="page"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-home"></use></svg><span data-i18n="navHome">Home</span></button>
+        <button class="sidenav-link" type="button" data-app-nav="medicine-list"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-pill"></use></svg><span data-i18n="navMedicines">Medicines</span></button>
+        <button class="sidenav-link" type="button" data-app-nav="condition-list"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-conditions"></use></svg><span data-i18n="navConditions">Conditions</span></button>
+        <button class="sidenav-link" type="button" data-app-nav="lab-tests"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-lab"></use></svg><span data-i18n="navTests">Medical tests</span></button>
+        <button class="sidenav-link" type="button" data-app-nav="pregnancy"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-pregnancy"></use></svg><span data-i18n="navPregnancy">Pregnancy</span></button>
+        <button class="sidenav-link" type="button" data-app-nav="interactions"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-interactions"></use></svg><span data-i18n="navInteractions">Interactions</span></button>
+      </div>
+      <p class="sidenav-kicker" data-i18n="navToolsLabel">TOOLS</p>
+      <div class="sidenav-links">
+        <button class="sidenav-link" type="button" data-app-nav="dose-calculator"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-dose"></use></svg><span data-i18n="navDoses">Dose calculator</span></button>
+        <button class="sidenav-link" type="button" data-app-nav="calculators"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-calc"></use></svg><span data-i18n="navCalculators">Clinical calculators</span></button>
+        <button class="sidenav-link" type="button" data-app-nav="study"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-study"></use></svg><span data-i18n="navStudy">Study mode</span></button>
+        <button class="sidenav-link" type="button" data-app-nav="reminders"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-bell"></use></svg><span data-i18n="navReminders">Reminders</span></button>
+        <button class="sidenav-link" type="button" data-app-nav="assistant"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-dawaya-ai"></use></svg><span data-i18n="navAssistant">Drugcopeia AI</span></button>
+      </div>
+      <div class="sidenav-separator" role="presentation"></div>
+      <p class="sidenav-kicker" data-i18n="navSupportLabel">SUPPORT</p>
+      <div class="sidenav-links">
+        <button class="sidenav-link" type="button" data-app-nav="suggestions"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-feedback"></use></svg><span data-i18n="suggestionsMenu">Feedback</span></button>
+        <button class="sidenav-link" type="button" data-app-nav="about"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-info"></use></svg><span data-i18n="navAbout">About Drugcopeia</span></button>
+        <button class="sidenav-link" type="button" data-app-nav="privacy"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-lock"></use></svg><span data-i18n="navPrivacy">Privacy</span></button>
+        <button class="sidenav-link" type="button" data-app-nav="settings"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-settings"></use></svg><span data-i18n="navSettings">Settings</span></button>
+      </div>
+      <div class="sidenav-footer">
+        <p class="sidenav-note" data-i18n="sidenavSafetyNote">For information only. Ask a pharmacist or clinician.</p>
+      </div>
+    </nav>
+
+  <main id="mainContent" tabindex="-1">
+    <section class="search-top" data-main-page="medicines" aria-label="Search">
+      <div class="search-heading"><div><span class="section-kicker" id="searchKicker" data-i18n="directory">MEDICINE DIRECTORY</span><h2 id="searchHeadline" data-i18n="searchQuestion">What are you looking for?</h2></div><span class="db-count" id="dbCount">Live database</span></div>
+      <div class="search-composer">
+        <div class="search-box">
+          <span class="search-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg></span>
+          <input id="searchInput" type="search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions" aria-haspopup="listbox" placeholder="Search medicines and health conditions" aria-label="Search medicines and health conditions" data-i18n-placeholder="searchPlaceholder" data-i18n-aria="searchAria">
+          <button id="clearSearch" class="clear-btn" type="button" aria-label="Clear search" data-i18n-aria="clearAria" hidden>×</button>
+          <button id="voiceButton" class="search-tool" type="button" aria-label="Search by voice" data-i18n-aria="voiceButtonAria" title="Search by voice" data-i18n-title="voiceButtonAria"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-mic"></use></svg></button>
+          <button id="scanButton" class="search-tool" type="button" aria-label="Scan a box code" data-i18n-aria="scanButtonAria" title="Scan a box code" data-i18n-title="scanButtonAria"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-scan"></use></svg></button>
+          <button id="searchButton" class="search-btn" type="button" aria-label="Search" data-i18n-aria="searchAria" title="Search"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg></button>
+        </div>
+        <p class="search-tool-status" id="searchToolStatus" role="status" aria-live="polite" hidden></p>
+        <div class="search-by">
+          <button type="button" id="searchModeToggle" class="search-by-toggle" aria-expanded="false" aria-controls="searchByChips" aria-haspopup="true">
+            <span class="search-by-label" data-i18n="searchDrugBy">Search drug by</span>
+            <span class="search-by-current" id="searchModeCurrent">Brand name</span>
+            <svg class="search-by-chevron" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+          </button>
+          <div class="search-by-chips" id="searchByChips" role="group" aria-label="Search drug by" data-i18n-aria="searchDrugBy" hidden>
+            <button type="button" class="search-by-chip is-active" data-search-mode="brand" aria-pressed="true" data-i18n="brandName">Brand name</button>
+            <button type="button" class="search-by-chip" data-search-mode="generic" aria-pressed="false" data-i18n="genericName">Generic name / ingredient</button>
+            <button type="button" class="search-by-chip" data-search-mode="class" aria-pressed="false" data-i18n="drugGroupSearch">Drug class / group</button>
+            <button type="button" class="search-by-chip" data-search-mode="manufacturer" aria-pressed="false" data-i18n="manufacturer">Manufacturer</button>
+            <button type="button" class="search-by-chip" data-search-mode="price" aria-pressed="false" data-i18n="price">Price (EGP)</button>
+          </div>
+          <select id="searchMode" class="search-mode-native" aria-label="Choose search field" data-i18n-aria="searchFieldAria" tabindex="-1" aria-hidden="true"><option value="brand" data-i18n="brandName">Brand name</option><option value="generic" data-i18n="genericName">Generic name / ingredient</option><option value="class" data-i18n="drugGroupSearch">Drug class / group</option><option value="manufacturer" data-i18n="manufacturer">Manufacturer</option><option value="price" data-i18n="price">Price (EGP)</option></select>
+        </div>
+        <div id="suggestions" class="suggestions" role="listbox" aria-label="Search suggestions" data-i18n-aria="suggestionsAria" hidden></div>
+      </div>
+      <p class="wildcard-hint" data-i18n="wildcardHint">Use * or a space for letters you cannot remember</p>
+      <div class="home-shortcuts" role="group" aria-label="Shortcuts">
+        <button type="button" class="home-shortcut" data-app-nav="lab-tests"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-interactions"></use></svg><span data-i18n="labMenu">Medical tests</span></button>
+        <button type="button" class="home-shortcut" data-app-nav="calculators"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-dose"></use></svg><span data-i18n="navCalculators">Clinical calculators</span></button>
+        <button type="button" class="home-shortcut" data-app-nav="interactions"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-interactions"></use></svg><span data-i18n="navInteractions">Interactions</span></button>
+        <button type="button" class="home-shortcut" data-app-nav="pregnancy"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-pregnancy"></use></svg><span data-i18n="navPregnancyShort">Pregnancy</span></button>
+        <button type="button" class="home-shortcut" data-app-nav="reminders"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-pill"></use></svg><span data-i18n="navReminders">Reminders</span></button>
+      </div>
+
+    </section>
+
+    <section class="home-reading" data-main-page="medicines" aria-labelledby="readingHeading">
+      <div class="reading-head">
+        <h2 id="readingHeading" data-i18n="readingTitle">Drug news and scientific articles</h2>
+        <div class="reading-filters" role="group" aria-label="Filter news and articles" data-i18n-aria="readingFiltersAria">
+          <button type="button" class="search-by-chip is-active" data-reading-filter="all" aria-pressed="true" data-i18n="readingTabAll">All</button>
+          <button type="button" class="search-by-chip" data-reading-filter="news" aria-pressed="false" data-i18n="readingTabNews">Drug news</button>
+          <button type="button" class="search-by-chip" data-reading-filter="article" aria-pressed="false" data-i18n="readingTabArticles">Articles</button>
+        </div>
+        <p class="reading-status" id="readingStatus" role="status" aria-live="polite" hidden></p>
+      </div>
+      <div class="reading-list" id="readingList" aria-live="polite"></div>
+      <p class="reading-note" data-i18n="readingDisclaimer">Educational information only. It does not replace the product leaflet or advice from a doctor or pharmacist.</p>
+    </section>
+
+
+      <div class="new-medicine-cta" data-main-page="medicines">
+        <button id="newMedicineButton" class="new-medicine-button" type="button" aria-label="Add a new medicine" data-i18n-aria="addMedicineButtonAria">
+          <span class="new-medicine-plus" aria-hidden="true">+</span>
+          <span data-i18n="addMedicineButton">New medicine</span>
+        </button>
+      </div>
+
+    <section class="search-section search-results-section" data-main-page="medicines" aria-label="Directory">
+      <div class="browse-label" data-i18n="browseByLetter">Browse by first letter</div><div class="alphabet-strip" id="medicineAlphabet" role="group" aria-label="Browse medicines by first letter"></div>
+      <nav id="drugGroupTrail" class="drug-group-trail" aria-label="Medicine group path"></nav><div class="group-heading" id="drugGroupHeading" data-i18n="browseDrugGroups">Browse medicine groups</div><div class="drug-group-picker" id="drugGroups" role="group" aria-label="Medicine groups"></div><aside id="drugGroupInfo" class="drug-group-info" aria-live="polite" hidden></aside>
+      <div class="results-head" id="resultsHead" hidden><h3 id="resultsTitle">Search results</h3><span id="resultCount"></span></div>
+      <div class="results-grid" id="results" aria-live="polite"></div>
+      <section id="unifiedConditionSection" class="unified-condition-section" hidden><div class="unified-condition-heading"><h3 data-i18n="conditionMatchesHeading">Matching health conditions</h3><span id="unifiedConditionCount"></span></div><div id="unifiedConditionResults" class="unified-condition-results" aria-live="polite"></div></section>
+      <section id="unifiedLabSection" class="unified-condition-section unified-lab-section" hidden><div class="unified-condition-heading"><h3 data-i18n="labMatchesHeading">Matching medical tests</h3><span id="unifiedLabCount"></span></div><div id="unifiedLabResults" class="unified-condition-results" aria-live="polite"></div></section>
+      <div class="load-more-wrap" id="moreWrap" hidden><button id="loadMore" class="load-more"><span data-i18n="showMore">Show more</span> <span>↓</span></button></div>
+      <div id="emptyState" class="empty-state" hidden><span>⌕</span><h3 id="emptyTitle" data-i18n="noResults">No medicines found</h3><p id="emptyHint" data-i18n="noResultsHint">Try another spelling, search field, or ingredient.</p></div>
+      <div id="welcomeState" class="welcome-state"><span class="welcome-icon">✦</span><span data-i18n="welcome">Search to explore medicines in Egypt</span><span class="welcome-examples"><span class="welcome-chips-label" data-i18n="popularSearchesLabel">Popular searches</span><span class="welcome-chips" role="group" aria-label="Popular searches" data-i18n-aria="popularSearchesLabel"><button type="button" class="search-by-chip welcome-chip" data-popular-search="Panadol">Panadol</button><button type="button" class="search-by-chip welcome-chip" data-popular-search="Augmentin">Augmentin</button><button type="button" class="search-by-chip welcome-chip" data-popular-search="Brufen">Brufen</button><button type="button" class="search-by-chip welcome-chip" data-popular-search="Paracetamol">Paracetamol</button></span></span></div>
+    </section>
+
+    <section class="conditions-page" id="conditionsPage" data-main-page="conditions" hidden>
+      <h1 class="conditions-list-heading" data-i18n="conditionsListTitle">Health conditions</h1>
+      <div class="condition-search-wrap"><div class="condition-search unified-search"><label class="sr-only" for="conditionSearch" data-i18n="conditionsTitle">Health condition</label><span class="search-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg></span><input id="conditionSearch" type="search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="search" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="conditionSuggestions" aria-autocomplete="list" placeholder="Search a condition, e.g. asthma" data-i18n-placeholder="conditionSearchPlaceholder"><button id="conditionSearchButton" type="button" aria-label="Search" data-i18n-aria="conditionSearchButton"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg></button></div><div id="conditionSuggestions" class="suggestions condition-suggestions" role="listbox" aria-label="Condition suggestions" hidden></div></div>
+      <nav id="conditionGroupTrail" class="drug-group-trail condition-group-trail" aria-label="Condition group path" hidden></nav>
+      <div class="group-heading" id="conditionSystemsHeading" data-i18n="browseBodySystems">Browse by body system</div><div class="condition-group-picker" id="conditionGroups" role="group" aria-label="Browse conditions by body system"></div><div class="group-heading condition-type-heading" id="conditionTypesHeading" data-i18n="browseConditionTypes">Browse by condition type</div><div class="condition-group-picker condition-type-picker" id="conditionTypes" role="group" aria-label="Browse conditions by type"></div>
+      <div class="browse-label condition-letter-label" id="conditionLetterLabel" data-i18n="browseConditionLetter">Browse conditions by first letter</div><div class="alphabet-strip condition-alphabet" id="conditionAlphabet" role="group" aria-label="Browse conditions by first letter"></div>
+      <div class="condition-quick"><span data-i18n="conditionPopular">Popular topics</span><button type="button" data-condition-query="diabetes" data-i18n="quickDiabetes">Diabetes</button><button type="button" data-condition-query="asthma" data-i18n="quickAsthma">Asthma</button><button type="button" data-condition-query="high blood pressure" data-i18n="quickBloodPressure">High blood pressure</button><button type="button" data-condition-query="migraine" data-i18n="quickMigraine">Migraine</button></div>
+      <p class="condition-source-note" id="conditionAlphabetNote" data-i18n="conditionAlphabetNote">Condition names are mainly English in this terminology database.</p><p class="condition-source-note" data-i18n="conditionsAttribution">Condition names, synonyms, ICD codes and source links from the free NLM ClinicalTables terminology API.</p>
+      <p id="conditionStatus" class="condition-status" data-i18n="conditionBrowseHint">Choose a body system or a letter to browse conditions.</p>
+      <div id="conditionResults" class="condition-results" aria-live="polite"></div>
+      <aside class="condition-disclaimer"><strong data-i18n="conditionDisclaimerTitle">For education only</strong><p data-i18n="conditionDisclaimer">Treatment depends on the diagnosis and the person. This page does not diagnose or prescribe. Use the source links and consult a licensed healthcare professional.</p></aside>
+    </section>
+
+    <section class="lab-tests-page" id="labTestsPage" data-main-page="lab-tests" hidden>
+      <span class="section-kicker" data-i18n="labTestsEyebrow">LABORATORY TEST DIRECTORY</span>
+      <h1 data-i18n="labTestsTitle">Medical tests</h1>
+      <p class="lab-tests-intro" data-i18n="labTestsIntro">Browse laboratory tests by clinical specialty. Select a test to learn what it checks, how it is performed, and how to prepare.</p>
+      <div class="lab-tests-search unified-search"><label class="sr-only" for="labTestSearch" data-i18n="labSearchLabel">Search tests</label><span class="search-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg></span><input autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="search" id="labTestSearch" type="search" data-i18n-placeholder="labSearchPlaceholder" placeholder="Search tests"><button id="labTestSearchButton" type="button" aria-label="Search" data-i18n-aria="conditionSearchButton"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg></button><button id="labTestSearchClear" type="button" aria-label="Clear" data-i18n-aria="labSearchClear">×</button><div id="labSuggestions" class="suggestions lab-suggestions" role="listbox" aria-label="Common lab tests" hidden></div></div>
+      <div class="lab-alphabet-wrap" id="labAlphabetWrap"><div class="browse-label" data-i18n="labBrowseLetter">Browse tests by first letter</div><div class="alphabet-strip" id="labAlphabet" role="group" aria-label="Browse tests by first letter"></div><p class="condition-source-note" data-i18n="labLetterNote">Letters follow the English test name.</p></div>
+      <nav class="lab-breadcrumb" id="labBreadcrumb" aria-label="Test directory path" hidden></nav>
+      <div class="lab-specialties" id="labSpecialties"></div>
+      <div class="lab-subgroups" id="labSubgroups" hidden></div><div class="lab-filter-block" id="labFilterBlock"><div class="group-heading" data-i18n="labPurposeHeading">Browse by test purpose</div><div class="condition-group-picker lab-filter-picker" id="labPurposes" role="group" aria-label="Browse tests by purpose"></div><div class="group-heading" data-i18n="labSampleHeading">Browse by sample type</div><div class="condition-group-picker lab-filter-picker" id="labSamples" role="group" aria-label="Browse tests by sample type"></div></div>
+      <div class="lab-test-list" id="labTestList" hidden></div>
+      <article class="lab-test-detail" id="labTestDetail" hidden></article>
+      <aside class="lab-disclaimer"><strong data-i18n="labDisclaimerTitle">Educational information</strong><p data-i18n="labDisclaimer">Results and reference ranges vary by laboratory and clinical context. This guide does not diagnose disease; follow the ordering clinician's instructions, especially for preparation and medication changes.</p></aside>
+    </section>
+
+    <section class="clinical-page" id="dosePage" data-main-page="dose-calculator" hidden>
+      <span class="section-kicker" data-i18n="doseEyebrow">PEDIATRIC DOSING REFERENCE</span>
+      <h1 data-i18n="doseTitle">Children’s dose calculator</h1>
+      <p class="clinical-intro" data-i18n="doseIntro">Enter a child’s weight for an educational reference range of common oral medicines, with daily limits and safety flags. For children 2 to 50 kg.</p>
+      <div class="clinical-layout">
+        <form class="clinical-card clinical-form" id="doseForm" novalidate>
+          <div class="clinical-field clinical-span-2">
+            <label for="doseMedicine" data-i18n="doseMedicineLabel">Medicine</label>
+            <div class="clinical-picker">
+              <span class="clinical-picker-icon search-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg></span>
+              <input id="doseMedicine" class="clinical-input clinical-picker-input" type="text" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" aria-controls="doseMedicineList" aria-describedby="doseMedicineHint" aria-required="true" autocomplete="off" spellcheck="false" dir="auto" placeholder="Search a medicine or active ingredient" data-i18n-placeholder="clinicalPickerPlaceholder">
+              <button class="clinical-picker-toggle" id="doseMedicineToggle" type="button" tabindex="-1" aria-label="Show medicine list" title="Show medicine list" data-i18n-aria="clinicalPickerToggleAria" data-i18n-title="clinicalPickerToggleAria" aria-controls="doseMedicineList" aria-expanded="false"><span aria-hidden="true">⌄</span></button>
+              <div class="clinical-picker-list" id="doseMedicineList" role="listbox" aria-label="Medicine options" data-i18n-aria="clinicalPickerListAria" hidden></div>
+            </div>
+            <small id="doseMedicineHint" class="clinical-help clinical-picker-hint" aria-live="polite"></small>
+          </div>
+          <div class="clinical-field">
+            <label for="doseWeight" data-i18n="doseWeightLabel">Child’s weight (kg)</label>
+            <input id="doseWeight" class="clinical-input" type="number" inputmode="decimal" min="2" max="50" step="0.1" placeholder="20" required dir="ltr" aria-describedby="doseStatus">
+          </div>
+          <div class="clinical-field">
+            <label for="doseAge" data-i18n="doseAgeLabel">Age (optional)</label>
+            <input id="doseAge" class="clinical-input" type="number" inputmode="decimal" min="0" max="215" step="1" placeholder="4" dir="ltr" aria-describedby="doseStatus">
+          </div>
+          <div class="clinical-field">
+            <label for="doseAgeUnit" data-i18n="doseAgeUnitLabel">Age unit</label>
+            <select id="doseAgeUnit" class="clinical-select">
+              <option value="years" data-i18n="doseYears">Years</option>
+              <option value="months" data-i18n="doseMonths">Months</option>
+            </select>
+          </div>
+          <div class="clinical-field clinical-span-2">
+            <label for="doseConcentration" data-i18n="doseConcentrationLabel">Liquid concentration (mg per 5 mL, optional)</label>
+            <input id="doseConcentration" class="clinical-input" type="number" inputmode="decimal" min="1" max="1000" step="0.1" placeholder="120" dir="ltr" aria-describedby="doseStatus">
+            <small class="clinical-help" data-i18n="doseConcentrationHint">Copy the concentration from the bottle to convert the milligram dose into millilitres. Always use the dosing syringe or cup supplied with the product.</small>
+          </div>
+          <div class="clinical-actions clinical-span-2">
+            <button class="clinical-primary" type="submit" data-i18n="doseCalculate">Calculate reference dose</button>
+            <button class="clinical-secondary" id="doseReset" type="button" data-i18n="doseReset">Clear</button>
+          </div>
+        </form>
+        <div id="doseStatus" class="clinical-status" role="status" aria-live="polite" hidden></div>
+        <div id="doseResult" class="dose-result" aria-live="polite" hidden></div>
+      </div>
+      <div class="clinical-sources">
+        <h2 data-i18n="doseSourcesTitle">Dose references</h2>
+        <div id="doseSources" class="clinical-source-links"></div>
+        <p data-i18n="doseSourceNote">Ranges summarised from FDA-approved labeling on DailyMed and WHO guidance.</p>
+      </div>
+      <aside class="clinical-disclaimer"><p data-i18n="doseDisclaimer">Fever, dehydration, kidney or liver disease, allergy, pregnancy or other medicines need an individual assessment. Ask a clinician before changing a prescribed dose.</p></aside>
+    </section>
+
+    <section class="clinical-page" id="interactionsPage" data-main-page="interactions" hidden>
+      <span class="section-kicker" data-i18n="interactionEyebrow">DRUG INTERACTION REFERENCE</span>
+      <h1 data-i18n="interactionTitle">Drug interaction checker</h1>
+      <p class="clinical-intro" data-i18n="interactionIntro">Choose two active ingredients to review a key interaction from this curated guide, or browse the list below.</p>
+      <div class="clinical-card interaction-checker">
+        <div class="interaction-fields">
+          <div class="clinical-field">
+            <label for="interactionA" data-i18n="interactionFirstLabel">First medicine or active ingredient</label>
+            <div class="clinical-picker">
+              <span class="clinical-picker-icon search-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg></span>
+              <input id="interactionA" class="clinical-input clinical-picker-input" type="text" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" aria-controls="interactionAList" aria-describedby="interactionAExamples interactionStatus" autocomplete="off" spellcheck="false" dir="auto" placeholder="Search a medicine or active ingredient" data-i18n-placeholder="clinicalPickerPlaceholder">
+              <button class="clinical-picker-toggle" id="interactionAToggle" type="button" tabindex="-1" aria-label="Show medicine list" title="Show medicine list" data-i18n-aria="clinicalPickerToggleAria" data-i18n-title="clinicalPickerToggleAria" aria-controls="interactionAList" aria-expanded="false"><span aria-hidden="true">⌄</span></button>
+              <div class="clinical-picker-list" id="interactionAList" role="listbox" aria-label="Medicine options" data-i18n-aria="clinicalPickerListAria" hidden></div>
+            </div>
+            <small id="interactionAExamples" class="clinical-help clinical-picker-hint" aria-live="polite"></small>
+          </div>
+          <button class="interaction-swap" id="interactionSwap" type="button" aria-label="Swap medicines" data-i18n-aria="interactionSwapAria" title="Swap medicines" data-i18n-title="interactionSwapAria"><span aria-hidden="true">⇄</span></button>
+          <div class="clinical-field">
+            <label for="interactionB" data-i18n="interactionSecondLabel">Second medicine or active ingredient</label>
+            <div class="clinical-picker">
+              <span class="clinical-picker-icon search-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg></span>
+              <input id="interactionB" class="clinical-input clinical-picker-input" type="text" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" aria-controls="interactionBList" aria-describedby="interactionBExamples interactionStatus" autocomplete="off" spellcheck="false" dir="auto" placeholder="Search a medicine or active ingredient" data-i18n-placeholder="clinicalPickerPlaceholder">
+              <button class="clinical-picker-toggle" id="interactionBToggle" type="button" tabindex="-1" aria-label="Show medicine list" title="Show medicine list" data-i18n-aria="clinicalPickerToggleAria" data-i18n-title="clinicalPickerToggleAria" aria-controls="interactionBList" aria-expanded="false"><span aria-hidden="true">⌄</span></button>
+              <div class="clinical-picker-list" id="interactionBList" role="listbox" aria-label="Medicine options" data-i18n-aria="clinicalPickerListAria" hidden></div>
+            </div>
+            <small id="interactionBExamples" class="clinical-help clinical-picker-hint" aria-live="polite"></small>
+          </div>
+        </div>
+        <div class="clinical-actions">
+          <button class="clinical-primary" id="interactionCheck" type="button" data-i18n="interactionCheck">Check interaction</button>
+          <button class="clinical-secondary" id="interactionReset" type="button" data-i18n="interactionReset">Clear</button>
+        </div>
+        <p class="interaction-ingredient-note" data-i18n="interactionIngredientNote">The guide compares active ingredients, not brand names — check the package.</p>
+      </div>
+      <div id="interactionStatus" class="clinical-status" role="status" aria-live="polite" hidden></div>
+      <div id="interactionAlert" class="interaction-alert-slot" hidden></div>
+      <div id="interactionResult" class="interaction-result" aria-live="polite" hidden></div>
+      <section class="interaction-examples">
+        <h2 data-i18n="interactionExamplesTitle">Common examples</h2>
+        <div id="interactionExamples" class="interaction-chips"></div>
+      </section>
+      <section class="interaction-browse">
+        <div class="interaction-browse-head"><h2 data-i18n="interactionBrowseTitle">Browse important interactions</h2><span id="interactionBrowseCount"></span></div>
+        <div class="interaction-toolbar">
+          <label class="sr-only" for="interactionSearch" data-i18n="interactionSearchLabel">Search interactions</label>
+          <div class="interaction-search-field unified-search"><span class="search-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg></span><input id="interactionSearch" class="clinical-input" type="search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="search" placeholder="Search by medicine or active ingredient" data-i18n-placeholder="interactionSearchPlaceholder"></div>
+          <select id="interactionSeverity" class="clinical-select" aria-label="Filter by severity" data-i18n-aria="interactionSeverityAria">
+            <option value="all" data-i18n="interactionAllSeverities">All severities</option>
+            <option value="avoid" data-i18n="interactionSeverityAvoid">Contraindicated</option>
+            <option value="major" data-i18n="interactionSeverityMajor">Major</option>
+            <option value="moderate" data-i18n="interactionSeverityModerate">Moderate</option>
+          </select>
+        </div>
+        <div id="interactionList" class="interaction-list"></div>
+        <button id="interactionMore" class="clinical-secondary interaction-more" type="button" data-i18n="showMore" hidden>Show more</button>
+      </section>
+      <div class="clinical-sources">
+        <h2 data-i18n="interactionSourcesTitle">Trusted sources</h2>
+        <div id="interactionSources" class="clinical-source-links"></div>
+        <p data-i18n="interactionSourceNote">Sources: FDA labeling on DailyMed, the FDA enzyme interaction table and CPIC guidance. The list is selective.</p>
+      </div>
+      <aside class="clinical-disclaimer"><p data-i18n="interactionDisclaimer">Absence of a pair here does not mean the combination is safe. Ask a pharmacist or prescriber before any treatment decision.</p></aside>
+    </section>
+
+    <section class="clinical-page reminders-page" id="remindersPage" data-main-page="reminders" hidden>
+      <span class="section-kicker" data-i18n="remindersEyebrow">DAILY MEDICATION PLAN</span>
+      <h1 data-i18n="remindersTitle">Medication reminders</h1>
+      <p class="clinical-intro" data-i18n="remindersIntro">Plan the medicines you take each day and track what is due. Reminders repeat daily on this device and are stored only in this browser.</p>
+      <div class="reminders-layout">
+        <div class="reminders-main">
+          <section class="reminder-summary" aria-labelledby="reminderSummaryTitle">
+            <div class="reminder-summary-head">
+              <div>
+                <span class="section-kicker" id="reminderSummaryTitle" data-i18n="reminderTodayKicker">TODAY</span>
+                <p class="reminder-next" id="reminderNext" aria-live="polite"></p>
+              </div>
+              <span class="reminder-progress-text" id="reminderProgressText"></span>
+            </div>
+            <div class="reminder-progress" id="reminderProgress" role="progressbar" aria-labelledby="reminderSummaryTitle" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <span class="reminder-progress-bar" id="reminderProgressBar"></span>
+            </div>
+          </section>
+          <div id="remindersStatus" class="clinical-status" role="status" aria-live="polite" hidden></div>
+          <div class="reminders-timeline-head">
+            <h2 id="remindersTimelineTitle" data-i18n="reminderTimelineTitle">Today’s timeline</h2>
+            <span id="remindersTimelineCount" class="reminders-count"></span>
+          </div>
+          <div id="reminderEmpty" class="reminder-empty">
+            <span class="reminder-empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-bell"></use></svg></span>
+            <h3 data-i18n="reminderEmptyTitle">No reminders yet</h3>
+            <p data-i18n="reminderEmptyText">Add a medicine and a time to start a daily timeline.</p>
+          </div>
+          <div id="reminderFeed" class="reminder-feed" aria-labelledby="remindersTimelineTitle"></div>
+          <div id="reminderTableWrap" class="reminder-table-wrap" hidden>
+            <table class="reminder-table">
+              <caption class="sr-only" data-i18n="reminderTableCaption">Daily medication reminders in time order</caption>
+              <thead>
+                <tr>
+                  <th scope="col" data-i18n="reminderTableTime">Time</th>
+                  <th scope="col" data-i18n="reminderTableMedicine">Medicine</th>
+                  <th scope="col" data-i18n="reminderTableDose">Dose</th>
+                  <th scope="col" data-i18n="reminderTableStatus">Status</th>
+                  <th scope="col"><span class="sr-only" data-i18n="reminderTableActions">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody id="reminderTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="reminder-side">
+          <form id="reminderForm" class="clinical-card reminder-form" novalidate>
+            <h2 data-i18n="reminderFormTitle">Add a daily reminder</h2>
+            <div class="clinical-field reminder-name-field">
+              <label for="reminderName" data-i18n="reminderNameLabel">Medicine name</label>
+              <input id="reminderName" class="clinical-input" type="text" maxlength="80" autocomplete="off" required placeholder="Example: Metformin 500 mg" data-i18n-placeholder="reminderNamePlaceholder" role="combobox" aria-expanded="false" aria-controls="reminderSuggestions" aria-autocomplete="list">
+              <div id="reminderSuggestions" class="suggestions reminder-suggestions" role="listbox" aria-label="Medicine suggestions" data-i18n-aria="suggestionsAria" hidden></div>
+            </div>
+            <div class="clinical-field">
+              <label for="reminderDose" data-i18n="reminderDoseLabel">Dose note (optional)</label>
+              <input id="reminderDose" class="clinical-input" type="text" maxlength="80" autocomplete="off" placeholder="Example: 1 tablet with breakfast" data-i18n-placeholder="reminderDosePlaceholder">
+            </div>
+            <div class="clinical-field">
+              <label for="reminderTime" data-i18n="reminderTimeLabel">Time</label>
+              <input id="reminderTime" class="clinical-input" type="time" required dir="ltr">
+            </div>
+            <p id="reminderFormHint" class="clinical-help" data-i18n="reminderFormHint">Repeats daily. Confirm the dose with your pharmacist.</p>
+            <div class="clinical-actions">
+              <button class="clinical-primary" type="submit" data-i18n="reminderAdd">Add reminder</button>
+            </div>
+            <p id="reminderFormStatus" class="clinical-status" role="status" aria-live="polite" hidden></p>
+            <p class="reminder-limit" id="reminderLimit" data-i18n="reminderLimitNote">Up to 20 reminders can be saved on this device.</p>
+          </form>
+          <aside class="clinical-disclaimer reminder-note">
+            <p><span data-i18n="reminderNotice">Reminders repeat every day. Drugcopeia sounds a long alert at the chosen time and follows up 10 and 30 minutes later until you mark the dose as taken. Keep the alarm your pharmacist recommends as a backup, and do not double a dose after a missed one unless a clinician tells you to.</span><span id="reminderNoticeExtra" hidden></span></p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="suggestions-page" id="suggestionsPage" data-main-page="suggestions" hidden>
+      <span class="section-kicker" data-i18n="suggestionsEyebrow">APP FEEDBACK</span>
+      <h1 data-i18n="suggestionsTitle">Share feedback</h1>
+      <p class="suggestions-intro" data-i18n="suggestionsDescription">Tell us what could make Drugcopeia more useful or report a problem.</p>
+      <form id="suggestionsForm" class="suggestion-form">
+        <label for="suggestionSubject" data-i18n="suggestionSubjectLabel">Subject</label>
+        <input id="suggestionSubject" name="subject" type="text" maxlength="160" required>
+        <label for="suggestionMessage" data-i18n="suggestionMessageLabel">Feedback</label>
+        <textarea id="suggestionMessage" name="message" rows="7" required></textarea>
+        <button type="submit" class="suggestion-submit" data-i18n="suggestionSubmit">Send</button>
+        <p class="suggestion-email-note" data-i18n="suggestionEmailNote">Your email app opens with the message ready. Press Send there to deliver it.</p>
+        <div id="suggestionFallback" class="suggestion-fallback" hidden>
+          <p data-i18n="suggestionFallbackNote">If your email app did not open, copy the message details below into it.</p>
+          <p><strong data-i18n="suggestionRecipientLabel">Send to</strong>: <span>hussein.sayed994@gmail.com</span></p>
+          <p><strong data-i18n="suggestionSubjectLabel">Subject</strong>: <span id="suggestionFallbackSubject"></span></p>
+          <pre id="suggestionFallbackBody"></pre>
+          <button type="button" id="suggestionCopyButton" data-i18n="suggestionCopy">Copy message</button>
+          <span id="suggestionCopyStatus" role="status" aria-live="polite"></span>
+          <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hussein.sayed994%40gmail.com" target="_blank" rel="noopener noreferrer" data-i18n="suggestionOpenGmail">Open Gmail</a>
+        </div>
+      </form>
+    </section>
+
+    <section class="suggestions-page new-medicine-page" id="newMedicinePage" data-main-page="add-medicine" hidden>
+      <span class="section-kicker" data-i18n="addMedicineEyebrow">CONTRIBUTE TO THE DIRECTORY</span>
+      <h1 data-i18n="addMedicineTitle">Add a new medicine</h1>
+      <p class="suggestions-intro" data-i18n="addMedicineIntro">Add a medicine that is missing from the directory. It is saved on this device so you can search for it again, and the app prepares an email with the details for the suggestions address.</p>
+      <form id="newMedicineForm" class="suggestion-form new-medicine-form">
+        <label for="newMedicineName" data-i18n="addMedicineNameLabel">Full commercial name</label>
+        <input id="newMedicineName" name="name" type="text" maxlength="160" autocomplete="off" required data-i18n-placeholder="addMedicineNamePlaceholder" placeholder="Example: Panadol Extra 24 F.C. Tablets">
+        <label for="newMedicineIngredient" data-i18n="addMedicineIngredientLabel">Active ingredient</label>
+        <input id="newMedicineIngredient" name="ingredient" type="text" maxlength="160" autocomplete="off" required data-i18n-placeholder="addMedicineIngredientPlaceholder" placeholder="Example: Paracetamol + caffeine">
+        <div class="new-medicine-grid">
+          <div class="new-medicine-field">
+            <label for="newMedicineConcentration" data-i18n="addMedicineConcentrationLabel">Concentration</label>
+            <input id="newMedicineConcentration" name="concentration" type="text" maxlength="80" autocomplete="off" required data-i18n-placeholder="addMedicineConcentrationPlaceholder" placeholder="Example: 500 mg + 65 mg">
+          </div>
+          <div class="new-medicine-field">
+            <label for="newMedicinePrice" data-i18n="addMedicinePriceLabel">Price (EGP)</label>
+            <input id="newMedicinePrice" name="price" type="number" min="0" step="0.01" inputmode="decimal" required data-i18n-placeholder="addMedicinePricePlaceholder" placeholder="Example: 54">
+          </div>
+          <div class="new-medicine-field">
+            <label for="newMedicineUnits" data-i18n="addMedicineUnitsLabel">Package units</label>
+            <input id="newMedicineUnits" name="units" type="text" maxlength="80" autocomplete="off" required data-i18n-placeholder="addMedicineUnitsPlaceholder" placeholder="Example: 2 strips (24 tablets)">
+          </div>
+        </div>
+        <button type="submit" class="suggestion-submit" data-i18n="addMedicineSubmit">Send</button>
+        <p class="suggestion-email-note" data-i18n="addMedicineEmailNote">The medicine is saved on this device immediately. Your email app opens with the fixed subject “إضافة دواء جديد”; press Send there to deliver it.</p>
+        <p id="newMedicineStatus" class="new-medicine-status" role="status" aria-live="polite" hidden></p>
+        <div id="newMedicineFallback" class="suggestion-fallback" hidden>
+          <p data-i18n="addMedicineFallbackNote">If your email app did not open, copy the prepared message into it.</p>
+          <p><strong data-i18n="suggestionRecipientLabel">Send to</strong>: <span id="newMedicineRecipient">hussein.sayed994@gmail.com</span></p>
+          <p><strong data-i18n="suggestionSubjectLabel">Subject</strong>: <span id="newMedicineFallbackSubject"></span></p>
+          <pre id="newMedicineFallbackBody"></pre>
+          <button type="button" id="newMedicineCopyButton" data-i18n="suggestionCopy">Copy message</button>
+          <span id="newMedicineCopyStatus" role="status" aria-live="polite"></span>
+          <a id="newMedicineOpenGmail" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hussein.sayed994%40gmail.com" target="_blank" rel="noopener noreferrer" data-i18n="suggestionOpenGmail">Open Gmail</a>
+        </div>
+      </form>
+      <aside class="new-medicine-notice">
+        <p data-i18n="addMedicineStorageNote">The entry is stored in this browser only. The prepared email lets the app owner review it for the shared directory.</p>
+        <p data-i18n="addMedicineSafetyNote">User-added records are not verified by the app. Confirm the name, active ingredient, concentration, units, and price with a pharmacist or the product leaflet.</p>
+      </aside>
+    </section>
+
+    <section class="clinical-page pregnancy-page" id="pregnancyPage" data-main-page="pregnancy" hidden>
+      <h1 class="sr-only" data-i18n="pregTitle">Pregnancy &amp; breastfeeding</h1>
+      <div class="preg-search-panel">
+        <h2 data-i18n="pregSearchTitle">Search a medicine</h2>
+        <p class="preg-search-hint" data-i18n="pregSearchHintText">Type a brand name or an active ingredient.</p>
+        <div class="preg-search-row">
+          <label class="sr-only" for="pregSearch" data-i18n="pregSearchLabel">Medicine or active ingredient</label>
+          <input id="pregSearch" role="combobox" aria-controls="pregProductList" aria-expanded="false" aria-autocomplete="list" type="search" autocomplete="off" spellcheck="false" dir="auto" data-i18n-placeholder="pregSearchPlaceholder" placeholder="e.g. Panadol, warfarin, بنادول">
+          <button id="pregSearchClear" type="button" data-i18n="pregSearchClear">Clear</button>
+        </div>
+        <div id="pregStatus" class="clinical-status" role="status" aria-live="polite" hidden></div>
+        <div id="pregProductList" role="listbox" class="preg-product-list" hidden></div>
+        <div id="pregResults" class="preg-results" aria-live="polite" hidden></div>
+      </div>
+
+      <div class="preg-cats-panel">
+        <h2 data-i18n="pregCatsTitle">Pregnancy drug categories</h2>
+        <div class="preg-cat-buttons" role="group" data-i18n-aria="pregCatsTitle" aria-label="Pregnancy drug categories">
+          <button type="button" class="preg-cat-btn" data-preg-cat="A" aria-expanded="false"><span class="preg-cat preg-cat-a" aria-hidden="true">A</span><span class="sr-only">A</span></button>
+          <button type="button" class="preg-cat-btn" data-preg-cat="B" aria-expanded="false"><span class="preg-cat preg-cat-b" aria-hidden="true">B</span><span class="sr-only">B</span></button>
+          <button type="button" class="preg-cat-btn" data-preg-cat="C" aria-expanded="false"><span class="preg-cat preg-cat-c" aria-hidden="true">C</span><span class="sr-only">C</span></button>
+          <button type="button" class="preg-cat-btn" data-preg-cat="D" aria-expanded="false"><span class="preg-cat preg-cat-d" aria-hidden="true">D</span><span class="sr-only">D</span></button>
+          <button type="button" class="preg-cat-btn" data-preg-cat="X" aria-expanded="false"><span class="preg-cat preg-cat-x" aria-hidden="true">X</span><span class="sr-only">X</span></button>
+          <button type="button" class="preg-cat-btn preg-cat-btn-wide" data-preg-cat="PLLR" aria-expanded="false">PLLR</button>
+        </div>
+        <div class="preg-cat-detail" id="pregCatDetail" aria-live="polite" hidden>
+          <article data-preg-detail="A" hidden><h3><span class="preg-cat preg-cat-a" aria-hidden="true">A</span> <span data-i18n="pregCatTitleA">Category A</span></h3><p data-i18n="pregCatA">Controlled studies in pregnant women showed no risk to the fetus.</p></article>
+          <article data-preg-detail="B" hidden><h3><span class="preg-cat preg-cat-b" aria-hidden="true">B</span> <span data-i18n="pregCatTitleB">Category B</span></h3><p data-i18n="pregCatB">Animal studies showed no risk.</p></article>
+          <article data-preg-detail="C" hidden><h3><span class="preg-cat preg-cat-c" aria-hidden="true">C</span> <span data-i18n="pregCatTitleC">Category C</span></h3><p data-i18n="pregCatC">Animal studies showed a risk.</p></article>
+          <article data-preg-detail="D" hidden><h3><span class="preg-cat preg-cat-d" aria-hidden="true">D</span> <span data-i18n="pregCatTitleD">Category D</span></h3><p data-i18n="pregCatD">Positive evidence of human fetal risk.</p></article>
+          <article data-preg-detail="X" hidden><h3><span class="preg-cat preg-cat-x" aria-hidden="true">X</span> <span data-i18n="pregCatTitleX">Category X</span></h3><p data-i18n="pregCatX">Proven fetal abnormalities.</p></article>
+          <article data-preg-detail="PLLR" hidden>
+            <h3 data-i18n="pregPllrTitle">The modern system: PLLR narrative sections</h3>
+            <p data-i18n="pregPllrIntro">Since 30 June 2015 the FDA replaced letters with narrative sections:</p>
+            <ul class="preg-pllr-list">
+              <li><strong>8.1</strong><div><b data-i18n="pregPllr81Title">Pregnancy</b><span data-i18n="pregPllr81Text"></span></div></li>
+              <li><strong>8.2</strong><div><b data-i18n="pregPllr82Title">Lactation</b><span data-i18n="pregPllr82Text"></span></div></li>
+              <li><strong>8.3</strong><div><b data-i18n="pregPllr83Title">Females and males of reproductive potential</b><span data-i18n="pregPllr83Text"></span></div></li>
+            </ul>
+            <p class="preg-explain-note" data-i18n="pregPllrNote"></p>
+          </article>
+          <p class="preg-explain-note preg-legacy-note" id="pregLegacyNote" data-i18n="pregLegacyNote">A letter is historical context only.</p>
+        </div>
+      </div>
+
+      <details class="dose-sources preg-sources">
+        <summary data-i18n="pregSourcesTitle">Official references</summary>
+        <p data-i18n="pregSourcesIntro">This page summarizes public information from these official sources:</p>
+        <ul>
+          <li><a href="https://dailymed.nlm.nih.gov/" target="_blank" rel="noreferrer">DailyMed (U.S. National Library of Medicine)</a> <span data-i18n="pregSourceDailyMedNote">current official product labeling, including the pregnancy and lactation sections</span></li>
+          <li><a href="https://www.ncbi.nlm.nih.gov/books/NBK501922/" target="_blank" rel="noreferrer">NIH LactMed</a> <span data-i18n="pregSourceLactMedNote">drug levels in milk and infant exposure during breastfeeding</span></li>
+          <li><a href="https://www.fda.gov/drugs/labeling-information-drug-products/pregnancy-and-lactation-labeling-drugs-final-rule" target="_blank" rel="noreferrer">U.S. FDA — Pregnancy and Lactation Labeling Rule (PLLR)</a> <span data-i18n="pregSourceFdaNote">the modern narrative labeling system that replaced the letter categories</span></li>
+          <li><a href="https://www.who.int/" target="_blank" rel="noreferrer">World Health Organization</a> <span data-i18n="pregSourceWhoNote">guidance on essential medicines, tuberculosis, malaria, and breastfeeding</span></li>
+        </ul>
+        <p data-i18n="pregSourcesNote">The curated summaries below are an educational preview written from these public references. They are not clinically reviewed, they are not verified against each product's current label, and they are not a basis for starting, stopping, or changing any medicine.</p>
+      </details>
+
+      <aside class="clinical-disclaimer preg-disclaimer"><strong data-i18n="pregDisclaimerTitle">Educational preview, not a treatment guide</strong><p data-i18n="pregDisclaimer">Educational summary from public references, not clinically reviewed; never start, stop, or switch a medicine based on it. Decisions belong with your doctor or pharmacist and the current label.</p></aside>
+    </section>
+
+    <section class="about-section" id="about" data-main-page="about" hidden>
+      <div><span class="section-kicker" data-i18n="aboutEyebrow">ABOUT DRUGCOPEIA</span><h2><span data-i18n="aboutTitle1">A local guide</span><br><em data-i18n="aboutTitle2">to clearer answers.</em></h2></div>
+      <div class="about-copy"><div class="about-intro"><div class="eyebrow"><span class="eyebrow-line"></span> <span data-i18n="eyebrow">YOUR MEDICINE, MADE CLEAR</span></div><h3><span data-i18n="heroTitle1">Find a medicine.</span> <em data-i18n="heroTitle2">Understand it better.</em></h3><p data-i18n="heroDescription">Search medicines available in Egypt by brand name, active ingredient, drug group, company, or price.</p></div><p data-i18n="aboutText1">Drugcopeia brings medicines found in Egypt into one searchable directory. Look up brand names, active ingredients, manufacturers, classifications, routes, and listed prices.</p><p data-i18n="aboutText2">Medicine listing data ships inside the app from the open Egyptian drug database and changes only when a new app build is installed. Educational pharmacology notes are separately curated and are not a substitute for an approved product leaflet.</p><p class="developer-credit"><strong data-i18n="developerCredit">Developed by Dr. Hussein Elnagmy</strong><span data-i18n="developerTitle">Clinical Pharmacist</span></p><p class="app-version"><span data-i18n="versionLabel">App version</span> <strong>1.7.8</strong></p><a class="source-link" href="https://github.com/hussein-elnagmy/egyptian-drug-database" target="_blank" rel="noreferrer"><span data-i18n="sourceLink">View medicine data source</span> <span>↗</span></a></div>
+      <div class="about-notices"><section class="disclaimer-strip"><span class="shield">✳</span><div><b data-i18n="disclaimerTitle">For information, not treatment</b><span data-i18n="disclaimerText">Never start, stop, or change a medicine without advice from a qualified healthcare professional.</span></div><a href="#safety"><span data-i18n="readSafety">Read safety note</span> <span>→</span></a></section><section class="safety-section" id="safety"><div class="safety-icon">!</div><div><h2 data-i18n="safetyTitle">Important safety information</h2><p data-i18n="safetyText">This guide is educational and does not provide diagnosis or individualized treatment. Doses and risks depend on the product, age, pregnancy, medical history, and other medicines. Read the product leaflet and ask a doctor or pharmacist. Prices and availability can change; verify locally before use.</p></div></section></div>
+    </section>
+    <section class="privacy-page" id="privacyPage" data-main-page="privacy" hidden>
+      <header class="privacy-head">
+        <span class="section-kicker" data-i18n="privacyEyebrow">PRIVACY</span>
+        <h2 data-i18n="privacyTitle">Your data stays on this device</h2>
+        <p class="privacy-lede" data-i18n="privacyLede">Drugcopeia has no account, no analytics, no advertising, no crash reporting and no telemetry. Nothing you search for, read or save is sent to us or to anyone else.</p>
+      </header>
+      <div class="privacy-grid">
+        <section class="privacy-card privacy-card-wide" aria-labelledby="privacyCollectTitle">
+          <h3 id="privacyCollectTitle" data-i18n="privacyCollectTitle">What we collect</h3>
+          <p class="privacy-big" data-i18n="privacyCollectValue">Nothing.</p>
+          <ul class="privacy-list">
+            <li data-i18n="privacyCollect1">No names, phone numbers, national IDs, email addresses or patient details.</li>
+            <li data-i18n="privacyCollect2">No search history, reading history or reminder contents leave the app.</li>
+            <li data-i18n="privacyCollect3">No device identifier, advertising ID, location or contacts. The camera and microphone open only from the Scan code and Voice search buttons, on your tap.</li>
+            <li data-i18n="privacyCollect4">All processing happens on this device, including search, conditions, lab tests, dose checks, interactions, reminders and barcode decoding. Voice search hands the microphone audio to the device's speech service, set to on-device recognition where the system supports it.</li>
+            <li data-i18n="privacyCollect5">Anything you type is checked on this device, and phone numbers, national IDs and email addresses are removed before the app uses them.</li>
+          </ul>
+        </section>
+
+        <section class="privacy-card" aria-labelledby="privacyDownloadsTitle">
+          <h3 id="privacyDownloadsTitle" data-i18n="privacyDownloadsTitle">What can be downloaded</h3>
+          <p data-i18n="privacyDownloadsText">The medicine, condition and lab-test databases are built into the app. The only optional downloads are the news list and the photographs in the “Photos” section of a medicine page, and each one runs only when you press its own button, with no identifiers, cookies or tracking parameters.</p>
+          <ul class="privacy-hosts" id="privacyHostList" aria-label="Allowed update hosts"></ul>
+          <p class="privacy-small" data-i18n="privacyDownloadsNote">Every other network request is blocked inside the app. Links open in a browser view only when you tap them.</p>
+          <p class="privacy-small" data-i18n="privacyLinksNote">Links — news, sources, product photographs — open in a browser view over the page you were reading. Drugcopeia reads nothing from it: no cookies, no history, no page content. Offline mode closes every link.</p>
+          <p class="privacy-small" data-i18n="privacyLinksWhere">On a phone that view is the browser component already on your device, with its own cookies and extensions, and it carries a button that hands the address to your default browser. On a computer Drugcopeia opens its own window and forgets it when you close it.</p>
+          <p class="privacy-small" data-i18n="privacyFeedbackNote">Feedback and new-medicine notes are prepared inside the app and handed to your own email app. Nothing is sent until you press Send there, and no account or email address is required.</p>
+        </section>
+
+        <section class="privacy-card" aria-labelledby="privacyPermissionsTitle">
+          <h3 id="privacyPermissionsTitle" data-i18n="privacyPermissionsTitle">Permissions and why</h3>
+          <ul class="privacy-list">
+            <li data-i18n="privacyPermNotify">Notifications: to show the reminders you created, at the time you chose.</li>
+            <li data-i18n="privacyPermAlarm">Alarms and restart (Android): to keep your reminders exact and restore them after a restart.</li>
+            <li data-i18n="privacyPermInternet">Internet: for the news update you press and the source links you open. The medicine directory works fully without it.</li>
+            <li data-i18n="privacyPermCamera">Camera: only when you scan a box code or take a search photo. A scanned frame is decoded on this device and is never stored or uploaded; a photo you pick for a search is sent to Google image search and Drugcopeia keeps no copy of it.</li>
+            <li data-i18n="privacyPermMic">Microphone: only while Voice search is listening. Drugcopeia does not store the audio; the device’s speech service turns it into text, on-device where supported.</li>
+            <li data-i18n="privacyPermNone">No location, contacts, phone state, files or advertising permissions are requested.</li>
+          </ul>
+        </section>
+
+        <section class="privacy-card privacy-card-wide" aria-labelledby="privacyLocalTitle">
+          <h3 id="privacyLocalTitle" data-i18n="privacyLocalTitle">Data on this device</h3>
+          <p data-i18n="privacyLocalText">Reminders, medicines you add and the saved headlines stay in this app’s private storage. They are never uploaded, and this device’s cloud backup is disabled for Drugcopeia where the platform allows it.</p>
+          <div class="privacy-actions">
+            <button type="button" class="privacy-danger" id="privacyWipe" data-i18n="privacyWipe">Delete all local data</button>
+            <span class="privacy-actions-note" id="privacyWipeStatus" role="status" aria-live="polite"></span>
+          </div>
+        </section>
+
+        <section class="privacy-card privacy-card-wide privacy-history" aria-labelledby="privacyHistoryTitle">
+          <div class="privacy-history-head">
+            <div>
+              <h3 id="privacyHistoryTitle" data-i18n="privacyHistoryTitle">Saved conversations</h3>
+              <p data-i18n="privacyHistoryText">Drugcopeia AI saves each conversation on this device, encrypted, so you can reopen it. Saving is on by default; turn it off here and everything saved is erased.</p>
+            </div>
+            <label class="privacy-switch">
+              <input type="checkbox" id="privacyHistory" role="switch" data-i18n-aria="privacyHistoryTitle">
+              <span class="privacy-switch-track" aria-hidden="true"></span>
+              <span class="privacy-switch-label" id="privacyHistoryLabel">Saving is on</span>
+            </label>
+          </div>
+          <div class="privacy-history-panel" id="privacyHistoryPanel">
+            <h4 data-i18n="privacyHistoryListTitle">Previous conversations</h4>
+            <ul class="privacy-history-list" id="privacyHistoryList"></ul>
+            <p class="privacy-history-empty" id="privacyHistoryEmpty" data-i18n="privacyHistoryEmpty" hidden>No saved conversations yet. Every new chat will appear here.</p>
+            <p class="privacy-actions-note" id="privacyHistoryStatus" role="status" aria-live="polite"></p>
+            <div class="privacy-actions">
+              <button type="button" class="privacy-danger" id="privacyHistoryClear" data-i18n="privacyHistoryClear">Delete all conversations</button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+      <p class="privacy-foot" data-i18n="privacyFoot">Drugcopeia is an educational medicine guide, not a medical record. Please do not type personal or patient details anywhere in the app.</p>
+    </section>
+
+    <section class="settings-page" id="settingsPage" data-main-page="settings" hidden>
+      <header class="settings-head">
+        <span class="section-kicker" data-i18n="settingsEyebrow">PREFERENCES</span>
+        <h2 data-i18n="settingsTitle">Settings</h2>
+        <p class="settings-lede" data-i18n="settingsLede">Appearance, text size, language and privacy. Every preference is stored on this device.</p>
+      </header>
+
+      <section class="settings-card" aria-labelledby="settingsDisplayTitle">
+        <h3 id="settingsDisplayTitle" data-i18n="settingsDisplay">Display</h3>
+
+        <div class="settings-row settings-row-stack">
+          <div class="settings-copy"><strong data-i18n="appearanceTitle">Appearance</strong><span data-i18n="settingsAppearanceHint">Light, dark, or the same look as your device.</span></div>
+          <div class="settings-choice settings-theme" id="settingsTheme" role="radiogroup" aria-label="Appearance" data-i18n-aria="appearanceTitle">
+            <button type="button" role="radio" data-settings-theme="light" aria-checked="false"><svg class="settings-choice-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-sun"></use></svg><span data-i18n="themeLightShort">Light</span></button>
+            <button type="button" role="radio" data-settings-theme="dark" aria-checked="false"><svg class="settings-choice-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-moon"></use></svg><span data-i18n="themeDarkShort">Dark</span></button>
+            <button type="button" role="radio" data-settings-theme="system" aria-checked="false"><svg class="settings-choice-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-monitor"></use></svg><span data-i18n="themeSystemShort">Automatic</span></button>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-copy"><strong data-i18n="typeScaleLabel">Text size</strong><span data-i18n="settingsTextSizeHint">Applies to every screen in the app.</span></div>
+          <div class="settings-stepper" role="group" aria-label="Text size" data-i18n-aria="typeScaleAria">
+            <button class="type-scale-button" type="button" data-type-scale="down" aria-label="Decrease text size" data-i18n-aria="typeScaleDecrease">A−</button>
+            <output class="type-scale-value" data-type-scale-value aria-live="polite" aria-atomic="true">100%</output>
+            <button class="type-scale-button" type="button" data-type-scale="up" aria-label="Increase text size" data-i18n-aria="typeScaleIncrease">A+</button>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-copy"><strong data-i18n="settingsLanguage">Language</strong><span data-i18n="settingsLanguageHint">English or Arabic interface.</span></div>
+          <div class="settings-choice" id="settingsLanguage" role="radiogroup" aria-label="Language" data-i18n-aria="settingsLanguage">
+            <button type="button" role="radio" data-settings-language="en" lang="en" aria-checked="true">English</button>
+            <button type="button" role="radio" data-settings-language="ar" lang="ar" aria-checked="false">العربية</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="settings-card" aria-labelledby="settingsPrivacyHeading">
+        <h3 id="settingsPrivacyHeading" data-i18n="settingsPrivacyHeading">Privacy and data</h3>
+        <div class="settings-row">
+          <div class="settings-copy"><strong data-i18n="privacyHistoryTitle">Save conversations</strong><span id="settingsHistoryState">Saving is on</span></div>
+          <label class="privacy-switch settings-switch" aria-label="Save conversations" data-i18n-aria="privacyHistoryTitle"><input type="checkbox" id="settingsHistory" role="switch"><span class="privacy-switch-track" aria-hidden="true"></span></label>
+        </div>
+        <div class="settings-row">
+          <div class="settings-copy"><strong data-i18n="navPrivacy">Privacy</strong><span data-i18n="settingsPrivacyHint">What is stored, and what is never collected.</span></div>
+          <button class="settings-link" type="button" data-app-nav="privacy" aria-label="Open" data-i18n-aria="settingsOpen"><span aria-hidden="true">›</span></button>
+        </div>
+        <div class="settings-row settings-row-stack">
+          <div class="settings-copy"><strong data-i18n="settingsEraseTitle">Delete local data</strong><span data-i18n="settingsEraseHint">Removes reminders, added medicines, saved headlines and assistant history from this device.</span></div>
+          <div class="settings-actions">
+            <button class="privacy-danger" type="button" id="settingsWipe" data-i18n="privacyWipe">Delete all local data</button>
+            <span class="privacy-actions-note" id="settingsWipeStatus" role="status" aria-live="polite"></span>
+          </div>
+        </div>
+      </section>
+
+
+      <section class="settings-card" aria-labelledby="settingsMoreTitle">
+        <h3 id="settingsMoreTitle" data-i18n="settingsMore">More</h3>
+        <div class="settings-row">
+          <div class="settings-copy"><strong data-i18n="navAssistant">Drugcopeia AI</strong><span data-i18n="settingsAiHint">Download and manage the on-device model.</span></div>
+          <button class="settings-link" type="button" data-app-nav="assistant" aria-label="Open" data-i18n-aria="settingsOpen"><span aria-hidden="true">›</span></button>
+        </div>
+        <div class="settings-row">
+          <div class="settings-copy"><strong data-i18n="navAbout">About Drugcopeia</strong><span id="settingsVersion">Drugcopeia</span></div>
+          <button class="settings-link" type="button" data-app-nav="about" aria-label="Open" data-i18n-aria="settingsOpen"><span aria-hidden="true">›</span></button>
+        </div>
+      </section>
+      <p class="settings-foot" data-i18n="settingsFoot">Preferences stay on this device and are never uploaded.</p>
+    </section>
+
+    <section class="assistant-page" id="assistantPage" data-main-page="assistant" hidden>
+      <header class="assistant-head">
+        <div class="assistant-head-top">
+          <span class="assistant-brand" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-dawaya-ai"></use></svg></span>
+          <div class="assistant-head-copy">
+            <span class="section-kicker" id="aiKicker">ON-DEVICE ASSISTANT</span>
+            <h2 id="aiPageTitle">Drugcopeia AI</h2>
+            <p id="aiPageSubtitle"></p>
+          </div>
+          <button type="button" class="ai-menu-button" id="aiMenuButton" aria-label="Assistant menu" aria-expanded="false" aria-controls="aiAssistantMenu">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+          </button>
+        </div>
+        <p class="assistant-status" id="aiStatus" data-state="init" role="status" aria-live="polite">
+          <span class="assistant-status-dot" aria-hidden="true"></span>
+          <span id="aiStatusText"></span>
+        </p>
+      </header>
+      <div class="drawer-backdrop ai-menu-backdrop" id="aiMenuBackdrop" hidden>
+        <aside class="app-drawer ai-menu" id="aiAssistantMenu" role="dialog" aria-modal="true" aria-labelledby="aiMenuTitle" hidden>
+          <div class="drawer-head ai-menu-head"><strong id="aiMenuTitle">Drugcopeia AI menu</strong><button type="button" class="ai-menu-close" id="aiMenuClose" aria-label="Close menu">×</button></div>
+          <nav class="drawer-nav ai-menu-body" aria-labelledby="aiMenuTitle">
+            <p class="drawer-kicker ai-menu-kicker" id="aiMenuConversationsKicker"></p>
+            <button class="drawer-link ai-menu-new" type="button" id="aiMenuNewChat"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg><span class="drawer-link-label"></span></button>
+            <div class="ai-menu-sessions" id="aiMenuSessions" role="list"></div>
+            <p class="ai-menu-empty" id="aiMenuSessionsEmpty" hidden></p>
+            <label class="privacy-switch ai-menu-row">
+              <span class="ai-menu-row-title" id="aiMenuHistoryTitle"></span>
+              <input type="checkbox" id="aiMenuHistoryToggle" role="switch">
+              <span class="privacy-switch-track" aria-hidden="true"></span>
+              <span class="privacy-switch-label" id="aiMenuHistoryLabel"></span>
+            </label>
+            <p class="ai-menu-note" id="aiMenuNote" hidden></p>
+            <button class="drawer-link ai-menu-settings" type="button" id="aiMenuSettings" aria-expanded="false" aria-controls="aiMenuSettingsPanel">
+              <svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-settings"></use></svg>
+              <span class="drawer-link-label" id="aiMenuSettingsLabel"></span>
+            </button>
+            <div class="ai-menu-section ai-menu-settings-panel" id="aiMenuSettingsPanel" hidden>
+              <p class="ai-menu-note" id="aiMenuModelLine"></p>
+              <p class="ai-menu-note" id="aiMenuLeanLine"></p>
+              <div class="ai-actions ai-menu-actions">
+                <button type="button" class="ai-button" id="aiMenuModel"></button>
+                <button type="button" class="ai-button ai-button-quiet" id="aiMenuManage"></button>
+              </div>
+              <div class="ai-advanced" id="aiAdvanced">
+                <p class="ai-advanced-title" id="aiAdvancedSummary"></p>
+                <p id="aiImportBody"></p>
+                <p id="aiCachedNote" class="ai-inline-note"></p>
+                <div class="ai-actions ai-menu-actions">
+                  <button type="button" class="ai-button ai-button-danger" id="aiDeleteModel"></button>
+                </div>
+              </div>
+            </div>
+          </nav>
+        </aside>
+      </div>
+
+      <section class="ai-panel" id="aiModelPanel" aria-labelledby="aiModelTitle">
+        <div class="ai-panel-head">
+          <div class="ai-panel-copy">
+            <h3 id="aiModelTitle"></h3>
+            <p id="aiModelBody"></p>
+          </div>
+          <span class="ai-panel-badge" id="aiModelSize"></span>
+        </div>
+        <div class="ai-panel-grid">
+          <div class="ai-note"><strong id="aiWifiTitle"></strong><span id="aiWifiBody"></span></div>
+          <div class="ai-note"><strong id="aiStorageTitle"></strong><span id="aiStorageBody"></span></div>
+          <div class="ai-note"><strong id="aiPrivacyTitle"></strong><span id="aiPrivacyBody"></span></div>
+        </div>
+        <div class="ai-progress" id="aiProgress" hidden>
+          <div class="ai-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="aiProgressBarWrap"><span id="aiProgressBar"></span></div>
+          <p class="ai-progress-text" id="aiProgressText"></p>
+        </div>
+        <p class="ai-inline-note ai-offline-note" id="aiOfflineNote" hidden></p>
+        <p class="ai-inline-note ai-error-note" id="aiErrorNote" role="alert" hidden></p>
+        <div class="ai-actions" id="aiDownloadActions">
+          <button type="button" class="ai-button ai-button-primary" id="aiStart"></button>
+          <button type="button" class="ai-button" id="aiPause" hidden></button>
+          <button type="button" class="ai-button" id="aiResume" hidden></button>
+          <button type="button" class="ai-button" id="aiRetry" hidden></button>
+          <button type="button" class="ai-button ai-button-quiet" id="aiCancelDownload" hidden></button>
+          <button type="button" class="ai-button" id="aiImport"></button>
+        </div>
+      </section>
+
+      <div class="ai-smart-banner" id="aiSmartBanner" hidden>
+        <strong id="aiSmartTitle"></strong>
+        <p class="ai-inline-note" id="aiSmartWhy" hidden></p>
+      </div>
+
+      <div class="ai-log" id="aiLog" role="log" aria-live="polite" aria-relevant="additions text"></div>
+
+      <form class="ai-composer" id="aiComposer" autocomplete="off">
+        <label class="sr-only" for="aiInput" id="aiInputLabel"></label>
+        <div class="ai-attach-preview" id="aiAttachPreview" hidden>
+          <img id="aiAttachThumb" alt="" decoding="async">
+          <p id="aiAttachState"></p>
+          <button type="button" class="ai-attach-remove" id="aiAttachRemove"></button>
+        </div>
+        <textarea id="aiInput" rows="1" maxlength="400" spellcheck="false" autocapitalize="sentences"></textarea>
+        <div class="ai-composer-bar">
+          <button type="button" class="ai-attach" id="aiAttach"></button>
+          <input type="file" id="aiPhotoInput" accept="image/*" hidden>
+          <span class="ai-hint" id="aiHint"></span>
+          <button type="submit" class="ai-send" id="aiSend"></button>
+          <button type="button" class="ai-stop" id="aiStop" hidden></button>
+        </div>
+      </form>
+
+    </section>
+  </main>
+
+    <aside class="safety-rail" aria-labelledby="safetyRailTitle">
+      <div class="safety-rail-inner">
+        <div class="rail-heading">
+          <span class="section-kicker" data-i18n="safetyRailKicker">SAFETY RAIL</span>
+          <span class="rail-status"><i aria-hidden="true"></i><span data-i18n="safetyRailStatus">Educational only</span></span>
+        </div>
+        <h2 id="safetyRailTitle" data-i18n="safetyRailTitle">Safety alerts</h2>
+        <section class="rail-alert" aria-labelledby="railEmergencyTitle">
+          <span class="rail-alert-icon" aria-hidden="true">!</span>
+          <div><strong id="railEmergencyTitle" data-i18n="railEmergencyTitle">Not for emergencies</strong><p data-i18n="railEmergencyText">For severe symptoms, call your local emergency number or go to the nearest emergency department.</p></div>
+        </section>
+        <section class="rail-quick" aria-labelledby="railQuickTitle">
+          <h3 id="railQuickTitle" data-i18n="railQuickTitle">Quick checks</h3>
+          <button class="rail-tool rail-tool-danger" type="button" data-app-nav="interactions">
+            <span class="rail-tool-icon" aria-hidden="true">⇄</span>
+            <span class="rail-tool-copy"><strong data-i18n="railInteractionsAction">Check two medicines</strong><small data-i18n="railInteractionsHint">Avoid, major, or moderate pairs</small></span>
+            <span class="rail-tool-arrow" aria-hidden="true">›</span>
+          </button>
+          <button class="rail-tool" type="button" data-app-nav="dose-calculator">
+            <span class="rail-tool-icon" aria-hidden="true">Σ</span>
+            <span class="rail-tool-copy"><strong data-i18n="railDoseAction">Pediatric dose reference</strong><small data-i18n="railDoseHint">Weight-based ranges from 2 kg</small></span>
+            <span class="rail-tool-arrow" aria-hidden="true">›</span>
+          </button>
+          <button class="rail-tool" type="button" data-app-nav="reminders">
+            <span class="rail-tool-icon" aria-hidden="true">◷</span>
+            <span class="rail-tool-copy"><strong data-i18n="railRemindersAction">Medication reminders</strong><small data-i18n="railRemindersHint">Daily schedule and timeline</small></span>
+            <span class="rail-tool-arrow" aria-hidden="true">›</span>
+          </button>
+        </section>
+        <section class="rail-card" aria-labelledby="railBeforeTitle">
+          <h3 id="railBeforeTitle" data-i18n="railBeforeTitle">Before you act</h3>
+          <ul>
+            <li data-i18n="railBefore1">Confirm the active ingredient and strength on the package.</li>
+            <li data-i18n="railBefore2">Ask about pregnancy, kidney or liver disease, and other medicines.</li>
+            <li data-i18n="railBefore3">Verify price and availability locally before relying on them.</li>
+          </ul>
+        </section>
+        <p class="rail-disclaimer" data-i18n="railDisclaimer">Educational information only. It does not replace diagnosis, professional advice, or a prescription.</p>
+      </div>
+    </aside>
+
+    <footer><a class="brand footer-brand" href="#"><img class="brand-mark" src="assets/red-crescent-rx-96.png" srcset="assets/red-crescent-rx-96.png 1x, assets/red-crescent-rx-192.png 2x" alt=""><span><strong class="footer-brand-name">Drugcopeia</strong><small class="footer-brand-subtitle">EGYPT MEDICINE GUIDE</small></span></a><span data-i18n="footerText">Built for learning, not diagnosis or treatment.</span><span data-i18n="footerSource">Medicine listings: CC0 · GitHub source</span></footer>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Quick navigation" data-i18n-aria="quickNavAria">
+    <button class="bottom-nav-item is-active" type="button" data-app-nav="unified-search" aria-current="page"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-home"></use></svg><span data-i18n="navHome">Home</span></button>
+    <button class="bottom-nav-item" type="button" data-app-nav="medicine-list"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-pill"></use></svg><span data-i18n="navMedicines">Medicines</span></button>
+    <button class="bottom-nav-item bottom-nav-ai" type="button" data-app-nav="assistant" aria-label="Drugcopeia AI"><span class="nav-ai-badge" aria-hidden="true"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-dawaya-ai"></use></svg></span><span data-i18n="navAssistant">Drugcopeia AI</span></button>
+    <button class="bottom-nav-item" type="button" data-app-nav="dose-calculator"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-dose"></use></svg><span data-i18n="navDoses">Doses</span></button>
+    <button class="bottom-nav-item" type="button" data-app-nav="interactions"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-interactions"></use></svg><span data-i18n="navInteractions">Interactions</span></button>
+  </nav>
+
+  <div class="modal-backdrop" id="modalBackdrop" hidden>
+    <article class="drug-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" id="modalClose" aria-label="Close" data-i18n-aria="closeAria">×</button>
+      <figure class="medicine-image-panel" id="modalImagePanel" hidden><div id="modalImage" class="modal-image"></div><div class="medicine-image-tools"><button type="button" class="image-search-button image-browser-button" id="modalImageSearch" data-i18n="viewInBrowser">View in browser</button><button type="button" class="image-search-button" id="commonsToggle" aria-expanded="false" aria-controls="commonsGrid">Show photos</button></div><figcaption id="modalImageCaption">Drugcopeia medicine guide</figcaption></figure>
+      <section class="commons-panel" id="commonsPanel" hidden>
+        <div class="commons-grid" id="commonsGrid" role="group" aria-label="Photographs from Wikimedia Commons" data-i18n-aria="commonsGridAria" hidden></div>
+        <p class="image-gallery-status" id="commonsStatus" role="status" aria-live="polite" hidden></p>
+      </section>
+      <div class="modal-topline"><span class="drug-type" id="modalClass">Medicine guide</span><span class="modal-brand" id="modalManufacturer"></span></div>
+      <h2 id="modalTitle"></h2><p class="modal-english" id="modalEnglish"></p><p class="modal-arabic" id="modalArabic" lang="ar" dir="rtl"></p>
+      <div class="detail-tools">
+        <button class="detail-tool" id="modalNativeButton" type="button" hidden>
+          <svg class="detail-tool-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-iphone"></use></svg>
+          <span id="modalNativeLabel" data-i18n="nativeViewLabel">Native view</span>
+        </button>
+      </div>
+      <div class="modal-facts" id="modalFacts"></div>
+      <p class="custom-record-note" id="modalCustomNote" hidden></p>
+      <div class="related-actions" id="relatedActions">
+        <button type="button" class="related-action" id="similarButton" aria-haspopup="dialog" aria-controls="relatedBackdrop">
+          <span class="related-action-main"><span class="related-action-label" data-i18n="relatedSimilarButton">Similar</span><span class="related-action-count" id="similarCount">0</span></span>
+          <span class="related-action-hint" data-i18n="relatedSimilarHint">Same active ingredient</span>
+        </button>
+        <button type="button" class="related-action" id="alternativesButton" aria-haspopup="dialog" aria-controls="relatedBackdrop">
+          <span class="related-action-main"><span class="related-action-label" data-i18n="relatedAlternativesButton">Alternatives</span><span class="related-action-count" id="alternativesCount">0</span></span>
+          <span class="related-action-hint" data-i18n="relatedAlternativesHint">Same class, different ingredient</span>
+        </button>
+      </div>
+      <div class="detail-tabs"><button class="detail-tab active" data-panel="overview" data-i18n="tabOverview">Overview</button><button class="detail-tab" data-panel="use" data-i18n="tabUse">Use & side effects</button><button class="detail-tab" data-panel="caution" data-i18n="tabSafety">Safety</button></div>
+      <div class="detail-panel" id="overviewPanel"></div><div class="detail-panel" id="usePanel" hidden></div><div class="detail-panel" id="cautionPanel" hidden></div>
+      <div class="detail-sources" id="modalSources"></div>
+      
+      <div class="modal-disclaimer" data-i18n="modalDisclaimer">Educational information only. Always check the product leaflet and consult a healthcare professional.</div>
+    </article>
+  </div>
+  <div class="modal-backdrop reading-backdrop" id="readingBackdrop" hidden>
+    <article class="drug-modal reading-modal" role="dialog" aria-modal="true" aria-labelledby="readingModalTitle">
+      <button class="modal-close" id="readingClose" aria-label="Close" data-i18n-aria="closeAria">×</button>
+      <div class="modal-topline"><span class="drug-type" id="readingKind"></span><span class="modal-brand" id="readingSourceName"></span></div>
+      <h2 id="readingModalTitle"></h2>
+      <p class="modal-english" id="readingModalSummary"></p>
+      <p class="reading-hint" id="readingHint" data-i18n="readingSectionHint">Tap a heading to read its details.</p>
+      <div class="detail-panel" id="readingBody"></div>
+      <div class="detail-sources" id="readingSources"></div>
+      <div class="modal-disclaimer" data-i18n="readingDisclaimer">Educational information only. It does not replace the product leaflet or advice from a doctor or pharmacist.</div>
+    </article>
+  </div>
+  <div class="modal-backdrop related-backdrop" id="relatedBackdrop" hidden>
+    <article class="related-panel" role="dialog" aria-modal="true" aria-labelledby="relatedTitle">
+      <header class="related-head">
+        <button class="app-back related-back" id="relatedBack" type="button" aria-label="Back to medicine" data-i18n-aria="relatedBackAria"><svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-back"></use></svg></button>
+        <button class="related-close" id="relatedClose" type="button" aria-label="Close" data-i18n-aria="closeAria">×</button>
+      </header>
+      <div class="related-body">
+        <div class="related-context"><span class="related-kicker" id="relatedKicker"></span><span class="related-current" id="relatedCurrent"></span></div>
+        <h2 id="relatedTitle"></h2>
+        <p class="related-intro" id="relatedIntro"></p>
+        <p class="related-note" id="relatedNote" hidden></p>
+        <div class="related-toolbar">
+          <label class="related-filter unified-search"><span class="sr-only" data-i18n="relatedFilterLabel">Filter this list</span><span class="search-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg></span><input id="relatedFilter" type="search" autocomplete="off" data-i18n-placeholder="relatedFilterPlaceholder"></label>
+          <div class="related-sort">
+            <span class="related-sort-label" data-i18n="relatedPriceSortLabel">Price</span>
+            <span class="related-sort-field">
+              <select id="relatedPriceSort" aria-label="Order results by price" data-i18n-aria="relatedPriceSortAria">
+                <option value="default" data-i18n="relatedPriceSortDefault">Default order</option>
+                <option value="high" data-i18n="relatedPriceSortHigh">Highest price first</option>
+                <option value="low" data-i18n="relatedPriceSortLow">Lowest price first</option>
+              </select>
+              <span class="related-sort-chevron" aria-hidden="true">⌄</span>
+            </span>
+          </div>
+          <span class="related-status" id="relatedStatus" role="status" aria-live="polite"></span>
+        </div>
+        <div class="related-list" id="relatedList"></div>
+        <button class="load-more" id="relatedMore" type="button" data-i18n="showMore" hidden>Show more</button>
+        <p class="related-disclaimer" data-i18n="relatedDisclaimer">This comparison is drawn from the listed database fields. It is not a recommendation to switch, substitute, or combine medicines. Confirm the exact product and active ingredient with a pharmacist or prescriber.</p>
+      </div>
+    </article>
+  </div>
+  <div class="modal-backdrop condition-detail-backdrop" id="conditionDetailBackdrop" hidden>
+    <article class="drug-modal condition-detail-modal" role="dialog" aria-modal="true" aria-labelledby="conditionDetailTitle">
+      <button class="modal-close" id="conditionDetailClose" aria-label="Close" data-i18n-aria="closeAria">×</button>
+      <div class="modal-topline"><span class="drug-type" data-i18n="conditionDetailLabel">HEALTH CONDITION</span><span class="modal-brand" id="conditionDetailCode"></span></div>
+      <h2 id="conditionDetailTitle"></h2>
+      <p class="condition-detail-alias" id="conditionDetailAliases"></p>
+      <div id="conditionDetailBody" class="condition-detail-body" aria-live="polite"></div>
+      <div id="conditionOverviewSummary" class="condition-overview-summary" aria-live="polite"></div>
+      <div id="conditionDetailSources" class="condition-links"></div>
+      <div class="modal-disclaimer" data-i18n="conditionDisclaimer">Treatment depends on the diagnosis and the person. This page does not diagnose or prescribe. Use the source links and consult a licensed healthcare professional.</div>
+    </article>
+  </div>
+  <div class="scan-overlay" id="scanOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="scanTitle">
+    <div class="scan-sheet">
+      <header class="scan-head">
+        <div><span class="section-kicker" data-i18n="scanEyebrow">CAMERA</span><h2 id="scanTitle" data-i18n="scanTitle">Scan a box code</h2></div>
+        <button class="scan-close" id="scanClose" type="button" aria-label="Close" data-i18n-aria="scanClose">×</button>
+      </header>
+      <div class="scan-stage">
+        <video id="scanVideo" playsinline autoplay muted aria-hidden="true"></video>
+        <div class="scan-reticle" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <p class="scan-status" id="scanStatus" role="status" aria-live="polite" data-i18n="scanStarting">Starting the camera…</p>
+      </div>
+      <p class="scan-help" data-i18n="scanHelp">Hold the barcode or QR code inside the frame. Nothing is uploaded; the code is read on this device.</p>
+      <form class="scan-manual" id="scanManualForm">
+        <label class="sr-only" for="scanManualInput" data-i18n="scanManualLabel">Code printed on the box</label>
+        <input id="scanManualInput" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" enterkeyhint="search" placeholder="Or type the code printed under the barcode" data-i18n-placeholder="scanManualPlaceholder">
+        <button type="submit" data-i18n="scanManualSubmit">Look up</button>
+      </form>
+    </div>
+  </div>
+  <div class="photo-viewer" id="photoViewer" role="dialog" aria-modal="true" aria-label="Full-size photograph" data-i18n-aria="photoViewerAria" hidden>
+    <button class="photo-viewer-close" id="photoViewerClose" type="button" aria-label="Close" data-i18n-aria="scanClose">×</button>
+    <div class="photo-viewer-stage" id="photoViewerStage"><img class="photo-viewer-image" id="photoViewerImage" alt="" decoding="async"><p class="photo-viewer-status" id="photoViewerStatus" role="status" aria-live="polite" hidden></p></div>
+    <footer class="photo-viewer-foot"><span class="photo-viewer-name" id="photoViewerCaption"></span><span class="photo-viewer-hint" data-i18n="photoZoomHint">Pinch to zoom</span></footer>
+  </div>
+  <div class="drawer-backdrop" id="drawerBackdrop" hidden><aside class="app-drawer" role="dialog" aria-modal="true" aria-label="Navigation" data-i18n-aria="navAria"><div class="drawer-head"><strong>Drugcopeia</strong><button id="menuClose" type="button" aria-label="Close menu" data-i18n-aria="menuCloseAria">×</button></div><nav class="drawer-nav" aria-label="All pages" data-i18n-aria="drawerNavAria">
+<p class="drawer-kicker" data-i18n="workspaceLabel">MEDICINE SAFETY WORKSPACE</p>
+<button class="drawer-link is-active" type="button" data-app-nav="unified-search" aria-current="page"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-home"></use></svg><span data-i18n="navHome">Home</span></button>
+<button class="drawer-link" type="button" data-app-nav="medicine-list"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-pill"></use></svg><span data-i18n="navMedicines">Medicines</span></button>
+<button class="drawer-link" type="button" data-app-nav="condition-list"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-conditions"></use></svg><span data-i18n="navConditions">Conditions</span></button>
+<button class="drawer-link" type="button" data-app-nav="lab-tests"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-lab"></use></svg><span data-i18n="navTests">Medical tests</span></button>
+<button class="drawer-link" type="button" data-app-nav="interactions"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-interactions"></use></svg><span data-i18n="navInteractions">Interactions</span></button>
+<button class="drawer-link" type="button" data-app-nav="pregnancy"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-pregnancy"></use></svg><span data-i18n="navPregnancy">Pregnancy</span></button>
+<div class="drawer-separator" role="presentation"></div>
+<p class="drawer-kicker" data-i18n="navToolsLabel">TOOLS</p>
+<button class="drawer-link" type="button" data-app-nav="dose-calculator"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-dose"></use></svg><span data-i18n="navDoses">Dose calculator</span></button>
+<button class="drawer-link" type="button" data-app-nav="calculators"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-calc"></use></svg><span data-i18n="navCalculators">Clinical calculators</span></button>
+<button class="drawer-link" type="button" data-app-nav="study"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-study"></use></svg><span data-i18n="navStudy">Study mode</span></button>
+<button class="drawer-link" type="button" data-app-nav="reminders"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-bell"></use></svg><span data-i18n="navReminders">Reminders</span></button>
+<button class="drawer-link" type="button" data-app-nav="assistant"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-dawaya-ai"></use></svg><span data-i18n="navAssistant">Drugcopeia AI</span></button>
+<div class="drawer-separator" role="presentation"></div>
+<p class="drawer-kicker" data-i18n="navSupportLabel">SUPPORT</p>
+<button class="drawer-link" type="button" data-app-nav="suggestions"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-feedback"></use></svg><span data-i18n="suggestionsMenu">Feedback</span></button>
+<a class="drawer-link" href="#about" data-app-nav="about"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-info"></use></svg><span data-i18n="navAbout">About Drugcopeia</span></a>
+<button class="drawer-link" type="button" data-app-nav="privacy"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-lock"></use></svg><span data-i18n="navPrivacy">Privacy</span></button>
+</nav><div class="drawer-bottom"><p class="drawer-safety-note" data-i18n="drawerSafetyNote">For information only. Ask a healthcare professional.</p><button class="drawer-settings" type="button" data-app-nav="settings"><svg class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-settings"></use></svg><span class="drawer-settings-copy"><strong data-i18n="navSettings">Settings</strong><small data-settings-summary>Follow system · 100%</small></span><span class="utility-chevron" aria-hidden="true">›</span></button></div></aside></div>
+  <script src="generated/privacy-config.js?v=196"></script>
+  <script src="net.js?v=196"></script>
+  <script src="core.js?v=196"></script>
+  <script src="lab-tests.js?v=196"></script>
+  <script src="clinical-tools.js?v=196"></script>
+  <script src="reading.js?v=196"></script>
+  <script src="news.js?v=196"></script>
+  <script src="app.js?v=196"></script>
+  <script src="alt-map.js?v=196"></script>
+  <script src="same-spec.js?v=196"></script>
+  <script src="features.js?v=196"></script>
+  <script src="ai/text.js?v=196"></script>
+  <script src="ai/search-index.js?v=196"></script>
+  <script src="ai/safety.js?v=196"></script>
+  <script src="ai/retrieval.js?v=196"></script>
+  <script src="ai/llm-bridge.js?v=196"></script>
+  <script src="ai/wasm-bridge.js?v=196"></script>
+  <script src="ai/model-manager.js?v=196"></script>
+  <script src="ai/pipeline.js?v=196"></script>
+  <script src="ai/secure-history.js?v=196"></script>
+  <script src="ai/photo-ask.js?v=196"></script>
+  <script src="ai/chat-ui.js?v=196"></script>
+  <script src="ai-shell.js?v=196"></script>
+  <script>let swReloaded=false;if('serviceWorker' in navigator)navigator.serviceWorker.addEventListener('controllerchange',()=>{if(swReloaded)return;swReloaded=true;location.reload()});window.addEventListener('load',()=>{const start=()=>{if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&location.hostname!=='127.0.0.1'&&location.hostname!=='localhost')navigator.serviceWorker.register('./service-worker.js').catch(()=>{})};(window.requestIdleCallback||(fn=>setTimeout(fn,1500)))(start)});</script>
+</body>
+</html>

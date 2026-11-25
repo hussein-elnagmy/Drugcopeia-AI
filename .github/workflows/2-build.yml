@@ -1,0 +1,178 @@
+name: build-native
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  android-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install web dependencies
+        working-directory: Source
+        run: npm ci --no-audit --no-fund
+      - name: Build llama-server from pinned llama.cpp source
+        working-directory: Source/android
+        run: |
+          set -euo pipefail
+          LLAMA_COMMIT=6d194531e1e5876d5d1a0641ce3ca7dae23f94ad
+          rm -rf /tmp/llama.cpp
+          git clone -q --depth 1 --branch b11985 https://github.com/ggml-org/llama.cpp.git /tmp/llama.cpp
+          test "$(git -C /tmp/llama.cpp rev-parse HEAD)" = "$LLAMA_COMMIT"
+          curl -sfL -o /tmp/ui-dist.tar.gz https://huggingface.co/buckets/ggml-org/llama-ui/resolve/b11985/dist.tar.gz
+          echo 'b3afc0f39735db54f3a095b75160752a35fdd4428a7cfb5ffbb334a4fe74e539  /tmp/ui-dist.tar.gz' | sha256sum -c -
+          mkdir -p /tmp/llama.cpp/tools/ui/dist
+          tar -xzf /tmp/ui-dist.tar.gz -C /tmp/llama.cpp/tools/ui/dist
+          cmake -S /tmp/llama.cpp -B /tmp/llama.cpp/build \
+            -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_LATEST_HOME/build/cmake/android.toolchain.cmake" \
+            -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-24 \
+            -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DLLAMA_CURL=OFF \
+            -DGGML_NATIVE=OFF -DLLAMA_USE_PREBUILT_UI=OFF -DLLAMA_BUILD_UI=OFF
+          cmake --build /tmp/llama.cpp/build --target llama-server -j"$(nproc)"
+          JNILIBS=app/src/main/jniLibs/arm64-v8a
+          mkdir -p "$JNILIBS"
+          "$ANDROID_NDK_LATEST_HOME"/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip \
+            /tmp/llama.cpp/build/bin/llama-server -o "$JNILIBS/libllamaserver.so"
+          cp "$ANDROID_NDK_LATEST_HOME"/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/*/lib/linux/aarch64/libomp.so \
+            "$JNILIBS/libomp.so"
+          file "$JNILIBS/libllamaserver.so"
+      - name: Build debug APK
+        working-directory: Source/android
+        run: |
+          rm -f local.properties
+          ./gradlew assembleDebug --no-daemon --stacktrace
+      - name: Verify AI runtime inside APK
+        run: |
+          APK=$(ls Source/android/app/build/outputs/apk/debug/*.apk | head -1)
+          unzip -l "$APK" | grep -E 'lib/arm64-v8a/lib(llamaserver|omp)\.so'
+          echo 'APK bundles libllamaserver.so (llama.cpp b11985, built from pinned source in CI) and libomp.so: on-device assistant runtime included.' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Dawaya-android-apk
+          path: Source/android/app/build/outputs/apk/**/*.apk
+
+  windows-exe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+      - name: Fetch llama.cpp b11985 Windows runtime (official release, hash-checked)
+        run: |
+          mkdir -p /tmp/llama-runtime
+          curl -fL -o /tmp/llama-runtime/win.zip https://github.com/ggml-org/llama.cpp/releases/download/b11985/llama-b11985-bin-win-cpu-x64.zip
+          echo '1c93f23afd48f8434c4cdc4d9f0a46f47a0d98ea6b3214007cbddc10c34c0c16  /tmp/llama-runtime/win.zip' | sha256sum -c -
+      - name: Install go-winres on the host toolchain
+        run: go install github.com/tc-hib/go-winres@latest
+      - name: Cross-compile Windows exe
+        working-directory: Source/windows
+        env:
+          GOOS: windows
+          GOARCH: amd64
+          CGO_ENABLED: '0'
+          LLAMA_WIN_ZIP: /tmp/llama-runtime/win.zip
+        run: ./build-windows.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Dawaya-windows-exe
+          path: Source/windows/dist/*.exe
+
+  macos-dmg:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build ad-hoc signed DMG
+        working-directory: Source/macos
+        run: ./build-macos.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Dawaya-macos-dmg
+          path: Source/build/Dawaya-mac.dmg
+
+
+  web-assistant-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Assistant suite (176 cases)
+        working-directory: Source
+        run: node tests/ai/run-tests.js
+      - name: Privacy gate
+        working-directory: Source
+        run: python3 scripts/privacy-check.py
+      - name: Vendored wllama runtime matches its pinned hashes
+        working-directory: Source/webapp/ai/vendor/wllama
+        run: |
+          printf '%s  %s\n' \
+            062c3fbaa266dea3ee991c699c176c21cf22e7199b0cac6481182b8708fc703b index.js \
+            b012436a101ede8c877f2d26644c3181429d4fb8da4fd90c356110d86bfd74a6 wllama.wasm \
+            6c5445f579a152c19ccad65aacebb57084d1db2f1b87ad473fa3acc0051ac72f wllama-compat.wasm | sha256sum -c -
+          echo 'Web assistant runtime: wllama 4.0.0 vendored and hash-verified; suite and privacy gate green.' >> $GITHUB_STEP_SUMMARY
+
+  ios-unsigned:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build iOS app (unsigned, device)
+        working-directory: Source/ios/App
+        run: |
+          xcodebuild -project App.xcodeproj -scheme App -configuration Debug \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            -derivedDataPath build/DerivedData build
+      - name: Package unsigned app
+        working-directory: Source/ios/App
+        run: |
+          APP_PATH=$(find build/DerivedData/Build/Products -name '*.app' -maxdepth 3 | head -1)
+          echo "Built app: $APP_PATH" >> $GITHUB_STEP_SUMMARY
+          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" Dawaya-ios-unsigned.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Dawaya-ios-simulator-unsigned
+          path: Source/ios/App/Dawaya-ios-unsigned.zip
+
+  release:
+    needs: [android-apk, windows-exe, macos-dmg, ios-unsigned, web-assistant-check]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+      - name: Zip source tree for release
+        run: |
+          R=$(tr -d '[:space:]' < Source/REVISION)
+          zip -qr "Drugcopeia-r${R}.zip" Source
+      - name: Stage per-OS release files
+        run: |
+          set -euo pipefail
+          R=$(tr -d '[:space:]' < Source/REVISION)
+          mkdir -p release
+          find dist/Dawaya-android-apk -name '*.apk' -exec cp {} "release/Drugcopeia-r${R}-android.apk" \;
+          find dist/Dawaya-windows-exe -name '*.exe' -exec cp {} "release/Drugcopeia-r${R}-windows.exe" \;
+          find dist/Dawaya-macos-dmg -name '*.dmg' -exec cp {} "release/Drugcopeia-r${R}-macos.dmg" \;
+          find dist/Dawaya-ios-simulator-unsigned -name '*.zip' -exec cp {} "release/Drugcopeia-r${R}-ios-unsigned.zip" \;
+          cp "Drugcopeia-r${R}.zip" "release/Drugcopeia-r${R}-source-web.zip"
+          ls -la release
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          R=$(tr -d '[:space:]' < Source/REVISION)
+          gh release view "r${R}" >/dev/null 2>&1 || gh release create "r${R}" release/* \
+            --title "Drugcopeia r${R}" \
+            --notes "Full app, all platforms, revision r${R}. android.apk for Android, windows.exe for Windows, macos.dmg for macOS, ios-unsigned.zip is the unsigned iOS build (sign and install locally with Xcode), source-web.zip is the full source including the web/PWA version."

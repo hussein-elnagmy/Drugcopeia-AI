@@ -1,0 +1,20 @@
+# Dependencies and generated web output
+node_modules/
+www/
+ios/App/App/public/
+
+# Xcode build products
+build/
+DerivedData/
+*.xcarchive
+*.ipa
+*.dSYM
+xcuserdata/
+
+# Local tooling and OS metadata
+.tools/
+.DS_Store
+Thumbs.db
+tools/monographs/cache/
+tools/labs/__pycache__/
+__pycache__/
