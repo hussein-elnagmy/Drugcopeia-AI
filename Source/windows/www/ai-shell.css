@@ -103,3 +103,4 @@ html.ai-only #aiPageTitle{white-space:nowrap}
 html.ai-only .ai-log{padding-top:18px}
 html.ai-only .ai-welcome{padding-top:5vh}
 @media(max-width:600px){html.ai-only .ai-smart-banner{margin-bottom:10px}html.ai-only .ai-welcome-mark{margin-top:6px}}
+@media(max-width:600px){html.ai-only .ai-welcome{padding-top:0}.ai-welcome-mark{width:40px;height:40px;font-size:1.2rem;margin-bottom:8px}.ai-welcome h1{font-size:1.3rem}.ai-welcome p{margin-bottom:12px;font-size:.88rem;line-height:1.5}.ai-chip{padding:8px 12px;font-size:.82rem}html.ai-only .ai-smart-banner{padding:8px 12px}}

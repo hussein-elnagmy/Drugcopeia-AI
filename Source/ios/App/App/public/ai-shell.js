@@ -56,7 +56,7 @@
     var has=!!log.querySelector('.ai-msg');
     if(has){if(welcome&&welcome.parentNode)welcome.remove();return}
     if(!welcome||welcome.dataset.lang!==lang()){if(welcome&&welcome.parentNode)welcome.remove();welcome=buildWelcome();welcome.dataset.lang=lang()}
-    if(!welcome.parentNode)log.insertBefore(welcome,log.firstChild);
+    if(!welcome.parentNode)log.insertBefore(welcome,log.firstChild);log.scrollTop=0;
   }
 
   /* ---- side menu ---- */
