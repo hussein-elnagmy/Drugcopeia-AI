@@ -200,7 +200,7 @@
         "android.permission.SCHEDULE_EXACT_ALARM": "Fires a reminder at the exact time the user chose.",
         "android.permission.VIBRATE": "Local reminder feedback.",
         "android.permission.CAMERA": "Opens only when the reader taps Scan code, to read the barcode or QR code printed on a medicine box. A scanned frame is decoded on the device by the system barcode decoder and is never stored or uploaded.",
-        "android.permission.RECORD_AUDIO": "Opens only while the reader holds the voice search button, to turn a spoken medicine name into search text. Dawaya does not store or transmit the recording; the system speech service performs recognition.",
+        "android.permission.RECORD_AUDIO": "Opens only while the reader holds the voice search button, to turn a spoken medicine name into search text. Drugcopeia AI does not store or transmit the recording; the system speech service performs recognition.",
         "android.permission.MODIFY_AUDIO_SETTINGS": "Used by the system speech recogniser while voice search is active, so its audio session can start and stop cleanly."
       },
       "forbidden": [
@@ -220,15 +220,15 @@
       "allowedUsageDescriptions": [
         {
           "key": "NSCameraUsageDescription",
-          "value": "Dawaya opens the camera only when you tap Scan code, or when you attach a photo to a question in the assistant. What you capture is decoded on this device - the box code, or the printed label text - and is never stored or sent."
+          "value": "Drugcopeia AI opens the camera only when you tap Scan code, or when you attach a photo to a question in the assistant. What you capture is decoded on this device - the box code, or the printed label text - and is never stored or sent."
         },
         {
           "key": "NSMicrophoneUsageDescription",
-          "value": "Dawaya uses the microphone only while voice search is listening, to turn your spoken medicine name into search text. Dawaya does not store or transmit the audio."
+          "value": "Drugcopeia AI uses the microphone only while voice search is listening, to turn your spoken medicine name into search text. Drugcopeia AI does not store or transmit the audio."
         },
         {
           "key": "NSSpeechRecognitionUsageDescription",
-          "value": "Dawaya turns your spoken medicine name into text for the search field. Recognition is performed by the system speech service."
+          "value": "Drugcopeia AI turns your spoken medicine name into text for the search field. Recognition is performed by the system speech service."
         }
       ],
       "forbiddenKeys": [
@@ -259,15 +259,15 @@
       "allowedUsageDescriptions": [
         {
           "key": "NSCameraUsageDescription",
-          "value": "Dawaya opens the camera only when you tap Scan code, or when you attach a photo to a question in the assistant. What you capture is decoded on this device - the box code, or the printed label text - and is never stored or sent."
+          "value": "Drugcopeia AI opens the camera only when you tap Scan code, or when you attach a photo to a question in the assistant. What you capture is decoded on this device - the box code, or the printed label text - and is never stored or sent."
         },
         {
           "key": "NSMicrophoneUsageDescription",
-          "value": "Dawaya uses the microphone only while voice search is listening, to turn your spoken medicine name into search text. Dawaya does not store or transmit the audio."
+          "value": "Drugcopeia AI uses the microphone only while voice search is listening, to turn your spoken medicine name into search text. Drugcopeia AI does not store or transmit the audio."
         },
         {
           "key": "NSSpeechRecognitionUsageDescription",
-          "value": "Dawaya turns your spoken medicine name into text for the search field. Recognition is performed by the system speech service."
+          "value": "Drugcopeia AI turns your spoken medicine name into text for the search field. Recognition is performed by the system speech service."
         }
       ],
       "forbiddenKeys": [
